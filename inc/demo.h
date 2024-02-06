@@ -9,7 +9,7 @@ typedef enum
     DEMOSNAP = 1,
     DEMOMESSAGE = 2,
     DEMODELTA = 3
-} demotype;
+} demochunktype;
 
 /* demoheader struct */
 typedef struct
@@ -17,10 +17,10 @@ typedef struct
     unsigned char version;
     char netversion[64];
     char mapname[64];
-    unsigned char mapsize[4]; // Big endian int
-    unsigned char mapcrc[4];  // Big endian int
+    int mapsize;
+    int mapcrc;
     char type[8];
-    unsigned char length[4]; // Big endian int
+    int length;
     char timestamp[20];
 } demoheader;
 
@@ -80,7 +80,7 @@ typedef union {
 /* demochunk struct */
 typedef struct
 {
-    demotype type;
+    demochunktype type;
     chunkdata data;
 } demochunk;
 

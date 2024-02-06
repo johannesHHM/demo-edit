@@ -14,35 +14,53 @@
 #define CHUNK_NORMAL_TYPE_MASK 0b01100000
 #define CHUNK_NORMAL_SIZE_MASK 0b00011111
 
+const char headermagic[7] = "TWDEMO\0";
 const unsigned char mapmagic[] = {0x6b, 0xe6, 0xda, 0x4a, 0xce, 0xbd, 0x38, 0x0c,
                                   0x9b, 0x5b, 0x12, 0x89, 0xc8, 0x42, 0xd7, 0x80};
 
-// TODO make version sensitive
 int readdemoheader(FILE *fp, demoheader *dh)
 {
-    if (fscanf(fp, "TWDEMO%*c%c", &dh->version) != 1)
+    char magicbuff[sizeof(headermagic)];
+    unsigned char intbuff[4];
+    
+    fread(magicbuff, 1, sizeof(headermagic), fp);
+    if (strcmp(magicbuff, headermagic) != 0)
         return -1;
-    if (fscanf(fp, "%64c", dh->netversion) != 1)
+    
+    if (fread(&dh->version, 1, 1, fp) != 1)
         return -2;
-    if (fscanf(fp, "%64c", dh->mapname) != 1)
+
+    if (fread(&dh->netversion, 1, 64, fp) != 64)
         return -3;
-    if (fread(dh->mapsize, 1, 4, fp) != 4)
+
+    if (fread(&dh->mapname, 1, 64, fp) != 64)
         return -4;
-    if (fread(dh->mapcrc, 1, 4, fp) != 4)
+
+    if (fread(intbuff, 1, 4, fp) != 4)
         return -5;
-    if (fscanf(fp, "%8c", dh->type) != 1)
+    dh->mapsize = reverseint(intbuff);
+
+    if (fread(intbuff, 1, 4, fp) != 4)
         return -6;
-    if (fread(dh->length, 1, 4, fp) != 4)
+    dh->mapcrc = reverseint(intbuff);
+
+    if (fread(dh->type, 1, 8, fp) != 8)
         return -7;
-    if (fscanf(fp, "%20c", dh->timestamp) != 1)
+
+    if (fread(intbuff, 1, 4, fp) != 4)
         return -8;
+    dh->length = reverseint(intbuff);
+
+    if (fread(dh->timestamp, 1, 20, fp) != 20)
+        return -9;
+
     printf("version: %hhu\n", dh->version);
     printf("net_version: %s\n", dh->netversion);
     printf("mapname: %s\n", dh->mapname);
-    printf("mapsize: %i\n", reverseint(dh->mapsize));
-    printf("mapcrc: %i\n", reverseint(dh->mapcrc));
+    printf("mapsize: %d\n", dh->mapsize);
+    printf("mapcrc: %d\n", dh->mapcrc);
     printf("type: %s\n", dh->type);
-    printf("length: %i\n", reverseint(dh->length));
+    printf("length: %d\n", dh->length);
     printf("timestamp: %s\n", dh->timestamp);
     return 1;
 }
@@ -203,7 +221,7 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
                         printf("%d, ", snap->items[i].data[y]);
                     printf("} ");
                 }
-                printf("]\n");
+                printf("], ");
             }
             else
             {

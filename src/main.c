@@ -123,18 +123,18 @@ int main()
 
     int ret = readdemoheader(fp, &dh);
 
-    dm.data = (unsigned char *)malloc(reverseint(dh.mapsize));
+    dm.data = (unsigned char *)malloc(dh.mapsize);
 
     printf("\nheader: %i\n", ret);
 
     if (dh.version >= 4)
         ret = readdemotimeline(fp, &dt);
 
-    printf("\ntimeline: %i\n", ret);
+    printf("timeline: %i\n", ret);
 
     // TODO should be able to read 5 aswell, change readdemomap to fit
     if (dh.version >= 6)
-        ret = readdemomap(fp, &dm, reverseint(dh.mapsize));
+        ret = readdemomap(fp, &dm, dh.mapsize);
     printf("readdemomap ret: %d\n\n", ret);
 
     demochunk dc;
