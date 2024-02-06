@@ -11,7 +11,7 @@ CFLAGS   := -Wall
 LDFLAGS  := -Llib
 LDLIBS   := -lm
 
-.PHONY: all clean run
+.PHONY: all clean run format
 
 all: $(EXE)
 
@@ -29,5 +29,10 @@ run: $(EXE)
 
 clean:
 	@$(RM) -rv $(BIN_DIR) $(OBJ_DIR)
+
+format:
+	clang-format -i --style=Microsoft src/*.c
+	clang-format -i --style=Microsoft inc/*.h
+
 
 -include $(OBJ:.o=.d)
