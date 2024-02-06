@@ -121,6 +121,22 @@ int main()
     demotimeline dt;
     demomap dm;
 
+    readdemoheader(fp, &dh);
+    readdemotimeline(fp, &dt);
+    readdemomap(fp, &dm, dh.mapsize, dh.version);
+
+    writedemoheader(op, &dh);
+    writedemotimeline(op, &dt);
+    writedemomap(op, &dm, dh.mapsize, dh.version);
+
+    fclose(fp);
+    fclose(op);
+
+    /*
+    demoheader dh;
+    demotimeline dt;
+    demomap dm;
+
     int ret = readdemoheader(fp, &dh);
 
     dm.data = (unsigned char *)malloc(dh.mapsize);
@@ -152,7 +168,7 @@ int main()
             putc(c, op);
         }
     } while (c != EOF);
-
+    */
     return EXIT_SUCCESS;
 
     /*

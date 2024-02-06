@@ -38,18 +38,18 @@ int readdemoheader(FILE *fp, demoheader *dh)
 
     if (fread(intbuff, 1, 4, fp) != 4)
         return -5;
-    dh->mapsize = reverseint(intbuff);
+    dh->mapsize = frombigendian(intbuff);
 
     if (fread(intbuff, 1, 4, fp) != 4)
         return -6;
-    dh->mapcrc = reverseint(intbuff);
+    dh->mapcrc = frombigendian(intbuff);
 
     if (fread(dh->type, 1, 8, fp) != 8)
         return -7;
 
     if (fread(intbuff, 1, 4, fp) != 4)
         return -8;
-    dh->length = reverseint(intbuff);
+    dh->length = frombigendian(intbuff);
 
     if (fread(dh->timestamp, 1, 20, fp) != 20)
         return -9;
@@ -84,6 +84,7 @@ int readdemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
         if (fread(dm->sha256, 1, 32, fp) != 32)
             return -2;
 
+    dm->data = (char *)malloc(mapsize);
     if (fread(dm->data, 1, mapsize, fp) != mapsize)
         return -3;
 
@@ -106,7 +107,7 @@ int readdemotick(FILE *fp, char chunkhead, demotick *tick, unsigned char ver)
             tick->innline = 0;
             unsigned char tickdelta[4];
             fread(tickdelta, 1, 4, fp);
-            tick->delta = reverseint(tickdelta);
+            tick->delta = frombigendian(tickdelta);
         }
     }
     else
@@ -117,7 +118,7 @@ int readdemotick(FILE *fp, char chunkhead, demotick *tick, unsigned char ver)
         {
             unsigned char tickdelta[4];
             fread(tickdelta, 1, 4, fp);
-            tick->delta = reverseint(tickdelta);
+            tick->delta = frombigendian(tickdelta);
         }
     }
     return 1;
@@ -246,5 +247,60 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
 
         printf("size: %d}\n", size);
     }
+    return 1;
+}
+
+int writedemoheader(FILE *fp, demoheader *dh)
+{
+    unsigned char intbuff[4];
+    if (fwrite(headermagic, 1, sizeof(headermagic), fp) != sizeof(headermagic))
+        return -1;
+
+    if (fwrite(&dh->version, 1, 1, fp) != 1)
+        return -2;
+
+    if (fwrite(dh->netversion, 1, 64, fp) != 64)
+        return -3;
+
+    if (fwrite(dh->mapname, 1, 64, fp) != 64)
+        return -4;
+
+    tobigendian(dh->mapsize, intbuff);
+    if (fwrite(intbuff, 1, 4, fp) != 4)
+        return -5;
+
+    tobigendian(dh->mapcrc, intbuff);
+    if (fwrite(intbuff, 1, 4, fp) != 4)
+        return -5;
+
+    if (fwrite(dh->type, 1, 8, fp) != 8)
+        return -6;
+
+    tobigendian(dh->length, intbuff);
+    if (fwrite(intbuff, 1, 4, fp) != 4)
+        return -7;
+
+    if (fwrite(dh->timestamp, 1, 20, fp) != 20)
+        return -8;
+
+    return 1;
+}
+
+int writedemotimeline(FILE *fp, demotimeline *dt)
+{
+    if (fwrite(dt->data, 1, 260, fp) != 260)
+        return -1;
+    return 1;
+}
+
+int writedemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
+{
+    if (ver >= 6)
+        if (fwrite(dm->sha256, 1, 32, fp) != 32)
+            return -1;
+
+    if (fwrite(dm->data, 1, mapsize, fp) != mapsize)
+        return -2;
+
     return 1;
 }

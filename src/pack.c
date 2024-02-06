@@ -1,8 +1,16 @@
 #include <stdio.h>
 
-int reverseint(const unsigned char in[4])
+int frombigendian(const unsigned char in[4])
 {
     return (in[0] << 24) | (in[1] << 16) | (in[2] << 8) | in[3];
+}
+
+void tobigendian(const int in, unsigned char out[4])
+{
+    out[0] = (in >> 24) & 0xff;
+    out[1] = (in >> 16) & 0xff;
+    out[2] = (in >> 8) & 0xff;
+    out[3] = in & 0xff;
 }
 
 int readint(unsigned char **cp)

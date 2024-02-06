@@ -3,8 +3,11 @@
 
 #include <stdio.h>
 
-/* reads a big endian int into an int */
-int reverseint(const unsigned char in[4]);
+/* turns a big endian int into an int */
+int frombigendian(const unsigned char in[4]);
+
+/* writes an int into a big endian int in given buffer */
+void tobigendian(const int in, unsigned char out[4]);
 
 /* reads a teeworlds packed int from given buffer */
 /* the given pointer is incremented */

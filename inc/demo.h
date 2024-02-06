@@ -34,7 +34,7 @@ typedef struct
 typedef struct
 {
     unsigned char sha256[32];
-    unsigned char *data;
+    char *data;
 } demomap;
 
 typedef struct
@@ -109,5 +109,9 @@ int readdemomap(FILE *demofile, demomap *map, int mapsize, unsigned char version
 /* Returns a positive number on success, 0 on EOF, and negative number on error */
 /* Will allocate memory if chunk is snap, delta or message */
 int readdemochunk(FILE *demofile, demochunk *chunk, unsigned char version);
+
+int writedemoheader(FILE *outfile, demoheader *header);
+int writedemotimeline(FILE *outfile, demotimeline *timeline);
+int writedemomap(FILE *outfile, demomap *map, int mapsize, unsigned char version);
 
 #endif // DEMO_H
