@@ -132,9 +132,7 @@ int main()
 
     printf("timeline: %i\n", ret);
 
-    // TODO should be able to read 5 aswell, change readdemomap to fit
-    if (dh.version >= 6)
-        ret = readdemomap(fp, &dm, dh.mapsize);
+    ret = readdemomap(fp, &dm, dh.mapsize, dh.version);
     printf("readdemomap ret: %d\n\n", ret);
 
     demochunk dc;

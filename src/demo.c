@@ -22,11 +22,11 @@ int readdemoheader(FILE *fp, demoheader *dh)
 {
     char magicbuff[sizeof(headermagic)];
     unsigned char intbuff[4];
-    
+
     fread(magicbuff, 1, sizeof(headermagic), fp);
     if (strcmp(magicbuff, headermagic) != 0)
         return -1;
-    
+
     if (fread(&dh->version, 1, 1, fp) != 1)
         return -2;
 
@@ -67,22 +67,22 @@ int readdemoheader(FILE *fp, demoheader *dh)
 
 int readdemotimeline(FILE *fp, demotimeline *dt)
 {
-    if (fscanf(fp, "%260c", dt->data) != 1)
+    if (fread(dt->data, 1, 260, fp) != 260)
         return -1;
     return 1;
 }
 
-// TODO make version sensitive
-int readdemomap(FILE *fp, demomap *dm, int mapsize)
+int readdemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
 {
     char magicbuf[sizeof(mapmagic)];
-    fread(magicbuf, 1, sizeof(mapmagic), fp);
 
+    fread(magicbuf, 1, sizeof(mapmagic), fp);
     if (memcmp(magicbuf, mapmagic, sizeof(mapmagic)) != 0)
         return -1;
 
-    if (fread(dm->sha256, 1, 32, fp) != 32)
-        return -2;
+    if (ver >= 4)
+        if (fread(dm->sha256, 1, 32, fp) != 32)
+            return -2;
 
     if (fread(dm->data, 1, mapsize, fp) != mapsize)
         return -3;

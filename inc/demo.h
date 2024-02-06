@@ -103,7 +103,7 @@ int readdemotimeline(FILE *demofile, demotimeline *timeline);
 /* Read demo map from demofile into given demomap */
 /* Returns a positive number on success, negative on fail */
 /* Must have read the demoheader and demotimeline beforehand */
-int readdemomap(FILE *demofile, demomap *map, int mapsize);
+int readdemomap(FILE *demofile, demomap *map, int mapsize, unsigned char version);
 
 /* Reads a chunk from demofile into given chunk */
 /* Returns a positive number on success, 0 on EOF, and negative number on error */
