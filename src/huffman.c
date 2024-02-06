@@ -1,4 +1,4 @@
-/* huffman compresion based on teeworlds/ddnet huffman */ 
+/* huffman compresion based on teeworlds/ddnet huffman */
 /*{ https://github.com/teeworlds/teeworlds/blob/master/src/engine/shared/huffman.cpp } */
 #include "../inc/huffman.h"
 
@@ -225,7 +225,7 @@ int decompresshuff(const char *inputbuff, int inputsize, char *outputbuff, int o
 
         if (node->symbol == HUFF_EOF_SYMBOL)
             return outputlen;
-        
+
         if (outputlen == outputsize)
             return -1;
 

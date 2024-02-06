@@ -1,5 +1,5 @@
-#include "../inc/huffman.h"
 #include "../inc/demo.h"
+#include "../inc/huffman.h"
 #include "../inc/pack.h"
 
 #include <stdio.h>
@@ -123,38 +123,37 @@ int main()
 
     int ret = readdemoheader(fp, &dh);
 
-    dm.data = (unsigned char*) malloc(reverseint(dh.mapsize));
+    dm.data = (unsigned char *)malloc(reverseint(dh.mapsize));
 
     printf("\nheader: %i\n", ret);
-    
+
     if (dh.version >= 4)
         ret = readdemotimeline(fp, &dt);
 
     printf("\ntimeline: %i\n", ret);
-    
+
     // TODO should be able to read 5 aswell, change readdemomap to fit
     if (dh.version >= 6)
         ret = readdemomap(fp, &dm, reverseint(dh.mapsize));
     printf("readdemomap ret: %d\n\n", ret);
-    
+
     demochunk dc;
     int i = 0;
     while (readdemochunk(fp, &dc, dh.version) > 0)
     {
         i++;
-    } 
+    }
     printf("i: %d\n", i);
     char c;
     do
     {
         c = getc(fp);
         // printf("%x\n", c & 0xff);
-        if (c != EOF) 
-        {            
+        if (c != EOF)
+        {
             putc(c, op);
         }
-    }
-    while(c != EOF);
+    } while (c != EOF);
 
     return EXIT_SUCCESS;
 
@@ -165,7 +164,7 @@ int main()
     char *line = NULL;
     size_t len = 0;
     ssize_t nread;
-    
+
     while ((nread = getline(&line, &len, fp)) != -1)
     {
         if (testcompress(line) < 0)
