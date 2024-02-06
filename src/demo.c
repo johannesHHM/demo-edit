@@ -109,7 +109,11 @@ int readdemosnap(FILE *fp, demosnap *snap, int size)
 
     fread(data, sizeof(unsigned char), size, fp);
 
-    int r = decompresshuff((char *)data, size, (char *)unpacked, 1034 * 8);
+    if (decompresshuff((char *)data, size, (char *)unpacked, 1034 * 8) < 0)
+    {
+        printf("[ ERROR ] error while decompressing snap cunk!\n");
+        return 0;
+    }
 
     unsigned char *cp = unpacked;
 
@@ -156,7 +160,7 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
         demotick *tick = (demotick *)malloc(sizeof(demotick));
         if (readdemotick(fp, chunkhead, tick, ver))
         {
-            chunk->type = 0;
+            chunk->type = DEMOTICK;
             chunk->data.tick = tick;
             printf("TICK={keyframe: %d, innline: %d, delta: %d}\n", tick->keyframe, tick->innline, tick->delta);
         }
@@ -181,7 +185,7 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
             demosnap *snap = (demosnap *)malloc(sizeof(demosnap));
             if (readdemosnap(fp, snap, size))
             {
-                chunk->type = 1; // TODO make a chunk-type enum
+                chunk->type = DEMOSNAP;
                 chunk->data.snap = snap;
 
                 printf("SNAPSHOT={datasize: %d, numitems: %d, offsets: [ ", snap->datasize, snap->numitems);
@@ -213,6 +217,10 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
         {
             printf("SNAPSHOT_DELTA={");
             fseek(fp, size, SEEK_CUR);
+        }
+        else 
+        {
+            printf("[ ERROR ] unknown chunk type!\n");
         }
 
         printf("size: %d}\n", size);
