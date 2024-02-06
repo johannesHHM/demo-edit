@@ -9,6 +9,8 @@
 #define CHUNK_TICK_MASK 0b10000000
 #define CHUNK_TICK_KEYFRAME_MASK 0b01000000
 #define CHUNK_TICK_INLINE_MASK 0b00100000
+#define CHUNK_TICK_DELTA_V3_MASK 0b00011111
+#define CHUNK_TICK_DELTA_V5_MASK 0b00111111
 #define CHUNK_NORMAL_TYPE_MASK 0b01100000
 #define CHUNK_NORMAL_SIZE_MASK 0b00011111
 
@@ -79,7 +81,7 @@ int readdemotick(FILE *fp, char chunkhead, demotick *tick, unsigned char ver)
         if (chunkhead & CHUNK_TICK_INLINE_MASK)
         {
             tick->innline = 1;
-            tick->delta = (chunkhead & 0x1f); // TODO name this mask?
+            tick->delta = (chunkhead & CHUNK_TICK_DELTA_V5_MASK);
         }
         else
         {
@@ -91,12 +93,13 @@ int readdemotick(FILE *fp, char chunkhead, demotick *tick, unsigned char ver)
     }
     else
     {
-        if ((chunkhead & 0x3f) != 0) // TODO name this mask?
-            tick->delta = (chunkhead & 0x3f);
+        if ((chunkhead & CHUNK_TICK_DELTA_V3_MASK) != 0)
+            tick->delta = (chunkhead & CHUNK_TICK_DELTA_V3_MASK);
         else
         {
             unsigned char tickdelta[4];
             fread(tickdelta, 1, 4, fp);
+            tick->delta = reverseint(tickdelta);
         }
     }
     return 1;
@@ -218,7 +221,7 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
             printf("SNAPSHOT_DELTA={");
             fseek(fp, size, SEEK_CUR);
         }
-        else 
+        else
         {
             printf("[ ERROR ] unknown chunk type!\n");
         }
