@@ -3,6 +3,14 @@
 
 #include <stdio.h>
 
+typedef enum
+{
+    DEMOTICK = 0,
+    DEMOSNAP = 1,
+    DEMOMESSAGE = 2,
+    DEMODELTA = 3
+} demotype;
+
 /* demoheader struct */
 typedef struct
 {
@@ -72,7 +80,7 @@ typedef union {
 /* demochunk struct */
 typedef struct
 {
-    unsigned char type;
+    demotype type;
     chunkdata data;
 } demochunk;
 

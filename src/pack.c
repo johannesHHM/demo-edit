@@ -1,5 +1,10 @@
 #include <stdio.h>
 
+int reverseint(const unsigned char in[4])
+{
+    return (in[0] << 24) | (in[1] << 16) | (in[2] << 8) | in[3];
+}
+
 int readint(unsigned char **cp)
 {
     int result = 0;

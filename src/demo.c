@@ -6,19 +6,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-const unsigned char CHUNK_TICK_MASK = 0b10000000;
-const unsigned char CHUNK_TICK_KEYFRAME_MASK = 0b01000000;
-const unsigned char CHUNK_TICK_INLINE_MASK = 0b00100000;
-const unsigned char CHUNK_TYPE_MASK = 0b01100000; // TODO add NORMAL_
-const unsigned char CHUNK_SIZE_MASK = 0b00011111;
+#define CHUNK_TICK_MASK 0b10000000
+#define CHUNK_TICK_KEYFRAME_MASK 0b01000000
+#define CHUNK_TICK_INLINE_MASK 0b00100000
+#define CHUNK_NORMAL_TYPE_MASK 0b01100000
+#define CHUNK_NORMAL_SIZE_MASK 0b00011111
 
 const unsigned char mapmagic[] = {0x6b, 0xe6, 0xda, 0x4a, 0xce, 0xbd, 0x38, 0x0c,
                                   0x9b, 0x5b, 0x12, 0x89, 0xc8, 0x42, 0xd7, 0x80};
-
-int reverseint(const unsigned char in[4])
-{
-    return (in[0] << 24) | (in[1] << 16) | (in[2] << 8) | in[3];
-}
 
 // TODO make version sensitive
 int readdemoheader(FILE *fp, demoheader *dh)
@@ -161,7 +156,7 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
         demotick *tick = (demotick *)malloc(sizeof(demotick));
         if (readdemotick(fp, chunkhead, tick, ver))
         {
-            chunk->type = 4;
+            chunk->type = 0;
             chunk->data.tick = tick;
             printf("TICK={keyframe: %d, innline: %d, delta: %d}\n", tick->keyframe, tick->innline, tick->delta);
         }
@@ -173,8 +168,8 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
     }
     else
     {
-        unsigned char type = (chunkhead & CHUNK_TYPE_MASK) >> 5;
-        short size = (chunkhead & CHUNK_SIZE_MASK);
+        unsigned char type = (chunkhead & CHUNK_NORMAL_TYPE_MASK) >> 5;
+        short size = (chunkhead & CHUNK_NORMAL_SIZE_MASK);
 
         if (size == 30)
             size = (short)fgetc(fp);
