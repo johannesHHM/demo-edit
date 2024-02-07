@@ -110,43 +110,8 @@ int testdecompress(char *line)
     return 1;
 }
 
-void dumbtestpacker()
-{
-    char b[] = {0xe0, 0xce, 0xf0, 0xaf, 0x09, 0xb7};
-    char *c = b;
-    printf("test: %d\n", readint(&c));
-
-    char buf[16] = {0};
-    int in = 196618;
-    int in2 = 8763289;
-
-    printf("input: %d\n", in);
-
-    for (int i = 0; i < 16; i++)
-        printf("%2X ", buf[i]);
-    printf("\n");
-    char *cp = buf;
-
-    writeint(in, &cp);
-    writeint(in2, &cp);
-
-    for (int i = 0; i < 16; i++)
-        printf("%2X ", buf[i]);
-    printf("\n");
-
-    cp = buf;
-    int res = readint(&cp);
-    int res2 = readint(&cp);
-
-    printf("res: %d\n", res);
-    printf("res2: %d\n", res2);
-}
-
 int main()
 {
-    dumbtestpacker();
-    // exit(0);
-
     inithuff(NULL);
 
     FILE *fp = fopen("data/test.demo", "r");
@@ -183,45 +148,7 @@ int main()
     fclose(fp);
     fclose(op);
 
-    /*
-    demoheader dh;
-    demotimeline dt;
-    demomap dm;
-
-    int ret = readdemoheader(fp, &dh);
-
-    dm.data = (unsigned char *)malloc(dh.mapsize);
-
-    printf("\nheader: %i\n", ret);
-
-    if (dh.version >= 4)
-        ret = readdemotimeline(fp, &dt);
-
-    printf("timeline: %i\n", ret);
-
-    ret = readdemomap(fp, &dm, dh.mapsize, dh.version);
-    printf("readdemomap ret: %d\n\n", ret);
-
-    demochunk dc;
-    int i = 0;
-    while (readdemochunk(fp, &dc, dh.version) > 0)
-    {
-        i++;
-    }
-    printf("i: %d\n", i);
-    char c;
-    do
-    {
-        c = getc(fp);
-        // printf("%x\n", c & 0xff);
-        if (c != EOF)
-        {
-            putc(c, op);
-        }
-    } while (c != EOF);
-    */
-    return EXIT_SUCCESS;
-
+    // Testing
     /*
     inithuff(NULL);
 

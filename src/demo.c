@@ -135,15 +135,7 @@ int readdemosnap(FILE *fp, demosnap *snap, int size)
 
     fread(data, 1, size, fp);
 
-    int ret = decompresshuff((char *)data, size, (char *)unpacked, 1034 * 8);
-    /*
-    printf("READ={compressed size = %d,  ret: %d, data: [ ", size, ret);
-    for (int i = 0; i < ret; i++)
-        printf("%x ", unpacked[i] & 0xff);
-    printf("]}\n");
-    */
-
-    if (ret < 0)
+    if (decompresshuff((char *)data, size, (char *)unpacked, 1034 * 8) < 0)
     {
         printf("[ ERROR ] error while decompressing snap cunk!\n");
         return 0;
@@ -163,7 +155,6 @@ int readdemosnap(FILE *fp, demosnap *snap, int size)
     for (int i = 0; i < snap->numitems; i++)
     {
         unsigned int item_key = (unsigned int)readint(&cp);
-        // printf("READKEY: %u\n", item_key);
 
         snap->items[i].type = (item_key >> 16) & 0xffff;
         snap->items[i].id = (item_key & 0xffff);
@@ -218,7 +209,6 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
 
     if (chunkhead & CHUNK_TICK_MASK)
     {
-        // printf("TICKHEAD={%2X}",(unsigned char) chunkhead);
         demotick *tick = (demotick *)malloc(sizeof(demotick));
         memset(tick, 0, sizeof(demotick)); // TODO idk if necessary
 
@@ -226,7 +216,6 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
         {
             chunk->type = DEMOTICK;
             chunk->data.tick = tick;
-            printf("TICK={keyframe: %d, innline: %d, delta: %d}\n", tick->keyframe, tick->innline, tick->delta);
         }
         else
         {
@@ -452,7 +441,6 @@ int writedemosnap(FILE *fp, demosnap *snap, unsigned char ver)
     for (int i = 0; i < snap->numitems; i++)
     {
         unsigned int key = (snap->items[i].type << 16) | snap->items[i].id;
-        // printf("WRITEKEY: %u\n", key);
         writeint((int)key, &cp);
 
         for (int y = 0; y < snap->items[i].numdata; y++)
