@@ -236,7 +236,7 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
     }
     else
     {
-        unsigned char type = (chunkhead & CHUNK_NORMAL_TYPE_MASK) >> 5;
+        demochunktype type = (demochunktype) ((chunkhead & CHUNK_NORMAL_TYPE_MASK) >> 5);
         short size = (chunkhead & CHUNK_NORMAL_SIZE_MASK);
 
         if (size == 30)
@@ -244,7 +244,7 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
         else if (size == 31)
             fread(&size, sizeof(short), 1, fp);
 
-        if (type == 1)
+        if (type == DEMOSNAP)
         {
             demosnap *snap = (demosnap *)malloc(sizeof(demosnap));
             memset(snap, 0, sizeof(demosnap)); // TODO idk if necessary
@@ -274,7 +274,7 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
                 return -1;
             }
         }
-        else if (type == 2)
+        else if (type == DEMOMESSAGE)
         {
             printf("MESSAGE={");
             demomessage *message = (demomessage *)malloc(sizeof(demomessage));
@@ -282,7 +282,7 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
             chunk->type = DEMOMESSAGE;
             chunk->data.message = message;
         }
-        else if (type == 3)
+        else if (type == DEMODELTA)
         {
             printf("SNAPSHOT_DELTA={");
             demodelta *delta = (demodelta *)malloc(sizeof(demodelta));
