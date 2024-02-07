@@ -355,12 +355,16 @@ int writedemotimeline(FILE *fp, demotimeline *dt)
 int writedemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
 {
     if (ver >= 6)
+    {
+        // TODO is this magic for v6+ only?
+        if (fwrite(mapmagic, 1, sizeof(mapmagic), fp) != sizeof(mapmagic))
+            return -1;
         if (fwrite(dm->sha256, 1, 32, fp) != 32)
             return -1;
+    }
 
     if (fwrite(dm->data, 1, mapsize, fp) != mapsize)
         return -2;
-
 
     return 1;
 }
