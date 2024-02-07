@@ -19,11 +19,11 @@ int readint(char **cp)
     int len = 1;
 
     unsigned char src = **cp;
-
     (*cp)++;
-    int sign = (src >> 6) & 1;
 
+    int sign = ((src >> 6) & 1);
     result |= (src & 0b00111111);
+
     for (int i = 0; i < 4; i++)
     {
         // printf("(%d, ", src);
@@ -32,6 +32,7 @@ int readint(char **cp)
 
         src = **cp;
         (*cp)++;
+
         len++;
 
         if (i == 3 && (src & 0b11110000) != 0)
@@ -47,9 +48,37 @@ int readint(char **cp)
     return result;
 }
 
-void writeint(int in, char **cp)
+/*
+int readint(char **src)
 {
-    int sign = in < 0;
+    printf("starting read: %x, ", **src & 0xff);
+    const int sign = (**src >> 6) & 1;
+
+    int out = **src & 0x3f;
+
+    const static int masks[] = {0x7F, 0x7F, 0x7F, 0x0F};
+    const static int shifts[] = {6, 6 + 7, 6 + 7 + 7, 6 + 7 + 7 + 7};
+
+    for (unsigned int i = 0; i < sizeof(masks); i++)
+    {
+        if (!(**src & 0x80))
+            break;
+        (*src)++;
+        printf("%x, ", **src & 0xff);
+        out |= (**src & masks[i]) << shifts[i];
+    }
+    (*src)++;
+    out ^= -sign;
+    printf("  result: %d\n", out);
+    return out;
+}
+*/
+
+void writeint(int i, char **cp)
+{
+    // printf("printing int: %d\n", i);
+    int sign = i < 0;
+    unsigned int in = i;
     in = (in ^ -sign);
     char next = (in & 0b00111111);
     in >>= 6;
@@ -60,7 +89,7 @@ void writeint(int in, char **cp)
     if (sign != 0)
         head |= 0b01000000;
 
-    printf("writing: %2X\n", head | next);
+    // printf("printing: %x\n", (head | next) & 0xff);
     **cp = head | next;
     (*cp)++;
 
@@ -74,7 +103,7 @@ void writeint(int in, char **cp)
         else
             head = 0;
 
-        printf("writing: %2X\n", head | next);
+        // printf("printing: %x\n", (head | next) & 0xff);
         **cp = head | next;
         (*cp)++;
     }

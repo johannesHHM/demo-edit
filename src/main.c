@@ -112,8 +112,12 @@ int testdecompress(char *line)
 
 void dumbtestpacker()
 {
+    char b[] = {0xe0, 0xce, 0xf0, 0xaf, 0x09, 0xb7};
+    char *c = b;
+    printf("test: %d\n", readint(&c));
+
     char buf[16] = {0};
-    int in = 550;
+    int in = 196618;
     int in2 = 8763289;
 
     printf("input: %d\n", in);
@@ -140,6 +144,9 @@ void dumbtestpacker()
 
 int main()
 {
+    dumbtestpacker();
+    // exit(0);
+
     inithuff(NULL);
 
     FILE *fp = fopen("data/test.demo", "r");
@@ -165,6 +172,10 @@ int main()
         if (dd.chunks[i].type == DEMOTICK)
         {
             writedemotick(op, dd.chunks[i].data.tick, dh.version);
+        }
+        else if (dd.chunks[i].type == DEMOSNAP)
+        {
+            writedemosnap(op, dd.chunks[i].data.snap, dh.version);
             exit(0);
         }
     }

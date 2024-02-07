@@ -133,9 +133,17 @@ int readdemosnap(FILE *fp, demosnap *snap, int size)
     char data[size];
     char unpacked[1024 * 8];
 
-    fread(data, sizeof(unsigned char), size, fp);
+    fread(data, 1, size, fp);
 
-    if (decompresshuff((char *)data, size, (char *)unpacked, 1034 * 8) < 0)
+    int ret = decompresshuff((char *)data, size, (char *)unpacked, 1034 * 8);
+    /*
+    printf("READ={compressed size = %d,  ret: %d, data: [ ", size, ret);
+    for (int i = 0; i < ret; i++)
+        printf("%x ", unpacked[i] & 0xff);
+    printf("]}\n");
+    */
+
+    if (ret < 0)
     {
         printf("[ ERROR ] error while decompressing snap cunk!\n");
         return 0;
@@ -147,7 +155,7 @@ int readdemosnap(FILE *fp, demosnap *snap, int size)
     snap->numitems = readint(&cp);
 
     snap->offsets = (int *)malloc(snap->numitems * sizeof(int));
-    snap->items = (demosnapitem *)malloc(snap->numitems * sizeof(int));
+    snap->items = (demosnapitem *)malloc(snap->numitems * sizeof(demosnapitem));
 
     for (int i = 0; i < snap->numitems; i++)
         snap->offsets[i] = readint(&cp);
@@ -155,6 +163,7 @@ int readdemosnap(FILE *fp, demosnap *snap, int size)
     for (int i = 0; i < snap->numitems; i++)
     {
         unsigned int item_key = (unsigned int)readint(&cp);
+        // printf("READKEY: %u\n", item_key);
 
         snap->items[i].type = (item_key >> 16) & 0xffff;
         snap->items[i].id = (item_key & 0xffff);
@@ -254,7 +263,7 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
                 {
                     printf("(type: %d, id: %d) { ", snap->items[i].type, snap->items[i].id);
                     for (int y = 0; y < snap->items[i].numdata; y++)
-                        printf("%d, ", snap->items[i].data[y]);
+                        printf("%i, ", snap->items[i].data[y]);
                     printf("} ");
                 }
                 printf("], ");
@@ -373,6 +382,36 @@ int writedemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
     return 1;
 }
 
+/* lifted from
+ * https://github.com/ddnet/ddnet/blob/79df5893ff26fa75d67e46f99e58f75b739ac362/src/engine/shared/demo.cpp#L270 */
+int writedemochunkheader(FILE *fp, demochunktype type, int size)
+{
+    unsigned char header[3];
+    header[0] = (((int)type) & 0x3) << 5;
+    if (size < 30)
+    {
+        header[0] |= size;
+        fputc(*header, fp);
+    }
+    else
+    {
+        if (size < 256)
+        {
+            header[0] |= 30;
+            header[1] = size & 0xff;
+            fwrite(header, 1, 2, fp);
+        }
+        else
+        {
+            header[0] |= 31;
+            header[1] = size & 0xff;
+            header[2] = size >> 8;
+            fwrite(header, 1, 3, fp);
+        }
+    }
+    return -1;
+}
+
 // TODO add erro checking
 int writedemotick(FILE *fp, demotick *tick, unsigned char ver)
 {
@@ -384,22 +423,48 @@ int writedemotick(FILE *fp, demotick *tick, unsigned char ver)
     if (tick->innline)
     {
         header |= tick->delta;
-        fwrite(&header, 1, 1, fp);
+        fputc(header, fp);
     }
     else
     {
-        fwrite(&header, 1, 1, fp);
+        fputc(header, fp);
         unsigned char intbuf[4];
         tobigendian(tick->delta, intbuf);
         fwrite(intbuf, 4, 1, fp);
     }
-    // printf("%2X\n", header);
 
     return 1;
 }
 
 int writedemosnap(FILE *fp, demosnap *snap, unsigned char ver)
 {
-    
+    char compressed[64 * 1024];
+    char decompressed[64 * 1024];
+
+    char *cp = decompressed;
+
+    writeint(snap->datasize, &cp);
+    writeint(snap->numitems, &cp);
+
+    for (int i = 0; i < snap->numitems; i++)
+        writeint(snap->offsets[i], &cp);
+
+    for (int i = 0; i < snap->numitems; i++)
+    {
+        unsigned int key = (snap->items[i].type << 16) | snap->items[i].id;
+        // printf("WRITEKEY: %u\n", key);
+        writeint((int)key, &cp);
+
+        for (int y = 0; y < snap->items[i].numdata; y++)
+            writeint(snap->items[i].data[y], &cp);
+    }
+    int size = cp - decompressed;
+
+    int datasize = compresshuff(decompressed, size, compressed, 64 * 1024);
+    datasize = ((datasize + 3) / 4) * 4;
+
+    writedemochunkheader(fp, DEMOSNAP, datasize);
+    fwrite(compressed, 1, datasize, fp);
+
     return 1;
 }
