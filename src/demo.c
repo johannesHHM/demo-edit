@@ -113,9 +113,13 @@ int readdemotick(FILE *fp, char chunkhead, demotick *tick, unsigned char ver)
     else
     {
         if ((chunkhead & CHUNK_TICK_DELTA_V3_MASK) != 0)
+        {
             tick->delta = (chunkhead & CHUNK_TICK_DELTA_V3_MASK);
+            tick->innline = 1;
+        }
         else
         {
+            tick->innline = 0;
             unsigned char tickdelta[4];
             fread(tickdelta, 1, 4, fp);
             tick->delta = frombigendian(tickdelta);
@@ -369,28 +373,33 @@ int writedemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
     return 1;
 }
 
+// TODO add erro checking
 int writedemotick(FILE *fp, demotick *tick, unsigned char ver)
 {
     unsigned char header = CHUNK_TICK_MASK;
     header |= tick->keyframe << 6;
     if (ver >= 5)
-    {
         header |= tick->innline << 5;
-        if (tick->innline)
-        {
-            header |= tick->delta;
-            fwrite(&header, 1, 1, fp);
-        }
-        else
-        {
-            fwrite(&header, 1, 1, fp);
-            unsigned char intbuf[4];
-            tobigendian(tick->delta, intbuf);
-            fwrite(intbuf, 4, 1, fp);
-        }
+    
+    if (tick->innline)
+    {
+        header |= tick->delta;
+        fwrite(&header, 1, 1, fp);
     }
+    else
+    {
+        fwrite(&header, 1, 1, fp);
+        unsigned char intbuf[4];
+        tobigendian(tick->delta, intbuf);
+        fwrite(intbuf, 4, 1, fp);
+    }
+    // printf("%2X\n", header);
 
-    printf("%2X\n", header);
+    return 1;
+}
 
+int writedemosnap(FILE *fp, demosnap *snap, unsigned char ver)
+{
+     
     return 1;
 }
