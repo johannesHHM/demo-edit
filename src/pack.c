@@ -13,6 +13,8 @@ void tobigendian(const int in, unsigned char out[4])
     out[3] = in & 0xff;
 }
 
+/* function is lifted from */
+/* https://github.com/heinrich5991/libtw2/blob/b9286674da94d3d45b9c10ffce517af394e2d58c/packer/src/lib.rs#L62 */
 int readint(char **cp)
 {
     int result = 0;
@@ -51,7 +53,6 @@ int readint(char **cp)
 /*
 int readint(char **src)
 {
-    printf("starting read: %x, ", **src & 0xff);
     const int sign = (**src >> 6) & 1;
 
     int out = **src & 0x3f;
@@ -64,19 +65,18 @@ int readint(char **src)
         if (!(**src & 0x80))
             break;
         (*src)++;
-        printf("%x, ", **src & 0xff);
         out |= (**src & masks[i]) << shifts[i];
     }
     (*src)++;
     out ^= -sign;
-    printf("  result: %d\n", out);
     return out;
 }
 */
 
+/* function is lifted from */
+/* https://github.com/heinrich5991/libtw2/blob/b9286674da94d3d45b9c10ffce517af394e2d58c/packer/src/lib.rs#L105 */
 void writeint(int i, char **cp)
 {
-    // printf("printing int: %d\n", i);
     int sign = i < 0;
     unsigned int in = i;
     in = (in ^ -sign);
@@ -89,7 +89,6 @@ void writeint(int i, char **cp)
     if (sign != 0)
         head |= 0b01000000;
 
-    // printf("printing: %x\n", (head | next) & 0xff);
     **cp = head | next;
     (*cp)++;
 
@@ -103,7 +102,6 @@ void writeint(int i, char **cp)
         else
             head = 0;
 
-        // printf("printing: %x\n", (head | next) & 0xff);
         **cp = head | next;
         (*cp)++;
     }

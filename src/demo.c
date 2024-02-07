@@ -236,7 +236,7 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
     }
     else
     {
-        demochunktype type = (demochunktype) ((chunkhead & CHUNK_NORMAL_TYPE_MASK) >> 5);
+        demochunktype type = (demochunktype)((chunkhead & CHUNK_NORMAL_TYPE_MASK) >> 5);
         short size = (chunkhead & CHUNK_NORMAL_SIZE_MASK);
 
         if (size == 30)
@@ -382,8 +382,8 @@ int writedemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
     return 1;
 }
 
-/* lifted from
- * https://github.com/ddnet/ddnet/blob/79df5893ff26fa75d67e46f99e58f75b739ac362/src/engine/shared/demo.cpp#L270 */
+/* function is lifted from */
+/* https://github.com/ddnet/ddnet/blob/79df5893ff26fa75d67e46f99e58f75b739ac362/src/engine/shared/demo.cpp#L270 */
 int writedemochunkheader(FILE *fp, demochunktype type, int size)
 {
     unsigned char header[3];
