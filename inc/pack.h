@@ -11,7 +11,7 @@ void tobigendian(const int in, unsigned char out[4]);
 
 /* reads a teeworlds packed int from given buffer */
 /* the given pointer is incremented */
-int readint(unsigned char **cp);
+int readint(char **cp);
 
 /* writes given int to teeworlds packed */
 /* the given pointer is incremented */

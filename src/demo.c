@@ -130,8 +130,8 @@ int readdemotick(FILE *fp, char chunkhead, demotick *tick, unsigned char ver)
 
 int readdemosnap(FILE *fp, demosnap *snap, int size)
 {
-    unsigned char data[size];
-    unsigned char unpacked[1024 * 8];
+    char data[size];
+    char unpacked[1024 * 8];
 
     fread(data, sizeof(unsigned char), size, fp);
 
@@ -141,7 +141,7 @@ int readdemosnap(FILE *fp, demosnap *snap, int size)
         return 0;
     }
 
-    unsigned char *cp = unpacked;
+    char *cp = unpacked;
 
     snap->datasize = readint(&cp);
     snap->numitems = readint(&cp);
@@ -400,6 +400,6 @@ int writedemotick(FILE *fp, demotick *tick, unsigned char ver)
 
 int writedemosnap(FILE *fp, demosnap *snap, unsigned char ver)
 {
-
+    
     return 1;
 }

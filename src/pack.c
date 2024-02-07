@@ -13,7 +13,7 @@ void tobigendian(const int in, unsigned char out[4])
     out[3] = in & 0xff;
 }
 
-int readint(unsigned char **cp)
+int readint(char **cp)
 {
     int result = 0;
     int len = 1;

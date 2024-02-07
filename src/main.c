@@ -131,8 +131,8 @@ void dumbtestpacker()
     printf("\n");
 
     cp = buf;
-    int res = readint((unsigned char **)&cp);
-    int res2 = readint((unsigned char **)&cp);
+    int res = readint(&cp);
+    int res2 = readint(&cp);
 
     printf("res: %d\n", res);
     printf("res2: %d\n", res2);
