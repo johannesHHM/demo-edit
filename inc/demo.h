@@ -63,10 +63,14 @@ typedef struct
 
 typedef struct
 {
+    int datasize;
+    char *data;
 } demodelta;
 
 typedef struct
 {
+    int datasize;
+    char *data;
 } demomessage;
 
 /* union for different chunks */
@@ -109,6 +113,8 @@ int readdemomap(FILE *demofile, demomap *map, int mapsize, unsigned char version
 /* Returns a positive number on success, 0 on EOF, and negative number on error */
 /* Will allocate memory if chunk is snap, delta or message */
 int readdemochunk(FILE *demofile, demochunk *chunk, unsigned char version);
+
+int readdemochunks(FILE *fp, demodata *dd, unsigned char ver);
 
 int writedemoheader(FILE *outfile, demoheader *header);
 int writedemotimeline(FILE *outfile, demotimeline *timeline);

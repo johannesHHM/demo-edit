@@ -169,6 +169,32 @@ int readdemosnap(FILE *fp, demosnap *snap, int size)
     return 1;
 }
 
+int readdemomessage(FILE *fp, demomessage *message, int size)
+{
+    unsigned char data[size];
+    if (fread(data, 1, size, fp) != size)
+        return -1;
+
+    message->data = (char *)malloc(size);
+    memcpy(message->data, data, size);
+    message->datasize = size;
+
+    return 1;
+}
+
+int readdemodelta(FILE *fp, demodelta *delta, int size)
+{
+    unsigned char data[size];
+    if (fread(data, 1, size, fp) != size)
+        return -1;
+
+    delta->data = (char *)malloc(size);
+    memcpy(delta->data, data, size);
+    delta->datasize = size;
+
+    return 1;
+}
+
 int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
 {
     char chunkhead;
@@ -233,12 +259,18 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
         else if (type == 2)
         {
             printf("MESSAGE={");
-            fseek(fp, size, SEEK_CUR);
+            demomessage *message = (demomessage *)malloc(sizeof(demomessage));
+            readdemomessage(fp, message, size);
+            chunk->type = DEMOMESSAGE;
+            chunk->data.message = message;
         }
         else if (type == 3)
         {
             printf("SNAPSHOT_DELTA={");
-            fseek(fp, size, SEEK_CUR);
+            demodelta *delta = (demodelta *)malloc(sizeof(demodelta));
+            readdemodelta(fp, delta, size);
+            chunk->type = DEMODELTA;
+            chunk->data.delta = delta;
         }
         else
         {
@@ -247,6 +279,28 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
 
         printf("size: %d}\n", size);
     }
+    return 1;
+}
+
+int readdemochunks(FILE *fp, demodata *dd, unsigned char ver)
+{
+    int chunkcap = 1024;
+    dd->numchunks = 0;
+    dd->chunks = (demochunk *)malloc(chunkcap * sizeof(demochunk));
+
+    while (readdemochunk(fp, &dd->chunks[dd->numchunks], ver))
+    {
+        dd->numchunks++;
+        if (dd->numchunks >= chunkcap)
+        {
+            chunkcap *= 2;
+            dd->chunks = (demochunk *)realloc(dd->chunks, chunkcap * sizeof(demochunk));
+        }
+    }
+
+    printf("numchunks: %d\n", dd->numchunks);
+    dd->chunks = (demochunk *)realloc(dd->chunks, dd->numchunks * sizeof(demochunk));
+
     return 1;
 }
 
@@ -302,5 +356,10 @@ int writedemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
     if (fwrite(dm->data, 1, mapsize, fp) != mapsize)
         return -2;
 
+    return 1;
+}
+
+int writedemotick(FILE *fp, demosnap *snap)
+{
     return 1;
 }

@@ -1,6 +1,5 @@
 #include "../inc/demo.h"
 #include "../inc/huffman.h"
-#include "../inc/pack.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -120,6 +119,7 @@ int main()
     demoheader dh;
     demotimeline dt;
     demomap dm;
+    demodata dd;
 
     readdemoheader(fp, &dh);
     readdemotimeline(fp, &dt);
@@ -128,6 +128,8 @@ int main()
     writedemoheader(op, &dh);
     writedemotimeline(op, &dt);
     writedemomap(op, &dm, dh.mapsize, dh.version);
+
+    readdemochunks(fp, &dd, dh.version);
 
     fclose(fp);
     fclose(op);
