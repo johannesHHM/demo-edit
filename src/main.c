@@ -1,5 +1,6 @@
 #include "../inc/demo.h"
 #include "../inc/huffman.h"
+#include "../inc/pack.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -107,6 +108,34 @@ int testdecompress(char *line)
         }
     }
     return 1;
+}
+
+void dumbtestpacker()
+{
+    char buf[16] = {0};
+    int in = 550;
+    int in2 = 8763289;
+
+    printf("input: %d\n", in);
+
+    for (int i = 0; i < 16; i++)
+        printf("%2X ", buf[i]);
+    printf("\n");
+    char *cp = buf;
+
+    writeint(in, &cp);
+    writeint(in2, &cp);
+
+    for (int i = 0; i < 16; i++)
+        printf("%2X ", buf[i]);
+    printf("\n");
+
+    cp = buf;
+    int res = readint((unsigned char **)&cp);
+    int res2 = readint((unsigned char **)&cp);
+
+    printf("res: %d\n", res);
+    printf("res2: %d\n", res2);
 }
 
 int main()

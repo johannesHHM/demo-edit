@@ -46,3 +46,36 @@ int readint(unsigned char **cp)
 
     return result;
 }
+
+void writeint(int in, char **cp)
+{
+    int sign = in < 0;
+    in = (in ^ -sign);
+    char next = (in & 0b00111111);
+    in >>= 6;
+
+    char head = 0;
+    if (in != 0)
+        head |= 0b10000000;
+    if (sign != 0)
+        head |= 0b01000000;
+
+    printf("writing: %2X\n", head | next);
+    **cp = head | next;
+    (*cp)++;
+
+    while (in != 0)
+    {
+        next = (in & 0b01111111);
+        in >>= 7;
+
+        if (in != 0)
+            head = 0b10000000;
+        else
+            head = 0;
+
+        printf("writing: %2X\n", head | next);
+        **cp = head | next;
+        (*cp)++;
+    }
+}

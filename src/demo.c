@@ -380,7 +380,7 @@ int writedemotick(FILE *fp, demotick *tick, unsigned char ver)
     header |= tick->keyframe << 6;
     if (ver >= 5)
         header |= tick->innline << 5;
-    
+
     if (tick->innline)
     {
         header |= tick->delta;
@@ -400,6 +400,6 @@ int writedemotick(FILE *fp, demotick *tick, unsigned char ver)
 
 int writedemosnap(FILE *fp, demosnap *snap, unsigned char ver)
 {
-     
+
     return 1;
 }
