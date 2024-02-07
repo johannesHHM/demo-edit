@@ -119,5 +119,6 @@ int readdemochunks(FILE *fp, demodata *dd, unsigned char ver);
 int writedemoheader(FILE *outfile, demoheader *header);
 int writedemotimeline(FILE *outfile, demotimeline *timeline);
 int writedemomap(FILE *outfile, demomap *map, int mapsize, unsigned char version);
+int writedemotick(FILE *outfile, demotick *tick, unsigned char version);
 
 #endif // DEMO_H

@@ -131,6 +131,15 @@ int main()
 
     readdemochunks(fp, &dd, dh.version);
 
+    for (int i = 0; i < dd.numchunks; i++)
+    {
+        if (dd.chunks[i].type == DEMOTICK)
+        {
+            writedemotick(op, dd.chunks[i].data.tick, dh.version);
+            exit(0);
+        }
+    }
+
     fclose(fp);
     fclose(op);
 

@@ -9,8 +9,8 @@
 #define CHUNK_TICK_MASK 0b10000000
 #define CHUNK_TICK_KEYFRAME_MASK 0b01000000
 #define CHUNK_TICK_INLINE_MASK 0b00100000
-#define CHUNK_TICK_DELTA_V3_MASK 0b00011111
-#define CHUNK_TICK_DELTA_V5_MASK 0b00111111
+#define CHUNK_TICK_DELTA_V3_MASK 0b00111111
+#define CHUNK_TICK_DELTA_V5_MASK 0b00011111
 #define CHUNK_NORMAL_TYPE_MASK 0b01100000
 #define CHUNK_NORMAL_SIZE_MASK 0b00011111
 
@@ -93,7 +93,7 @@ int readdemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
 
 int readdemotick(FILE *fp, char chunkhead, demotick *tick, unsigned char ver)
 {
-    tick->keyframe = (chunkhead & CHUNK_TICK_KEYFRAME_MASK);
+    tick->keyframe = (chunkhead & CHUNK_TICK_KEYFRAME_MASK) >> 6;
 
     if (ver >= 5)
     {
@@ -205,7 +205,10 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
 
     if (chunkhead & CHUNK_TICK_MASK)
     {
+        // printf("TICKHEAD={%2X}",(unsigned char) chunkhead);
         demotick *tick = (demotick *)malloc(sizeof(demotick));
+        memset(tick, 0, sizeof(demotick)); // TODO idk if necessary
+
         if (readdemotick(fp, chunkhead, tick, ver))
         {
             chunk->type = DEMOTICK;
@@ -231,6 +234,8 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
         if (type == 1)
         {
             demosnap *snap = (demosnap *)malloc(sizeof(demosnap));
+            memset(snap, 0, sizeof(demosnap)); // TODO idk if necessary
+
             if (readdemosnap(fp, snap, size))
             {
                 chunk->type = DEMOSNAP;
@@ -356,10 +361,32 @@ int writedemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
     if (fwrite(dm->data, 1, mapsize, fp) != mapsize)
         return -2;
 
+
     return 1;
 }
 
-int writedemotick(FILE *fp, demosnap *snap)
+int writedemotick(FILE *fp, demotick *tick, unsigned char ver)
 {
+    unsigned char header = CHUNK_TICK_MASK;
+    header |= tick->keyframe << 6;
+    if (ver >= 5)
+    {
+        header |= tick->innline << 5;
+        if (tick->innline)
+        {
+            header |= tick->delta;
+            fwrite(&header, 1, 1, fp);
+        }
+        else
+        {
+            fwrite(&header, 1, 1, fp);
+            unsigned char intbuf[4];
+            tobigendian(tick->delta, intbuf);
+            fwrite(intbuf, 4, 1, fp);
+        }
+    }
+
+    printf("%2X\n", header);
+
     return 1;
 }
