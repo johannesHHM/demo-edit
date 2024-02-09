@@ -68,15 +68,17 @@ int readdemotimeline(FILE *fp, demotimeline *dt)
 
 int readdemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
 {
-    char magicbuf[sizeof(mapmagic)];
+    if (ver >= 6)
+    {
+        char magicbuf[sizeof(mapmagic)];
 
-    fread(magicbuf, 1, sizeof(mapmagic), fp);
-    if (memcmp(magicbuf, mapmagic, sizeof(mapmagic)) != 0)
-        return -1;
+        fread(magicbuf, 1, sizeof(mapmagic), fp);
+        if (memcmp(magicbuf, mapmagic, sizeof(mapmagic)) != 0)
+            return -1;
 
-    if (ver >= 4)
         if (fread(dm->sha256, 1, 32, fp) != 32)
             return -2;
+    }
 
     dm->data = (char *)malloc(mapsize);
     if (fread(dm->data, 1, mapsize, fp) != mapsize)
@@ -585,7 +587,7 @@ void printdemo(demo *demo, char printchunks)
             break;
         case DEMODELTA:
             if (printchunks)
-                printdemodelta(chunk->data.delta);   
+                printdemodelta(chunk->data.delta);
             typecount[(int)DEMODELTA]++;
             break;
         default:
