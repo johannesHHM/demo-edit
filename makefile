@@ -2,7 +2,7 @@ SRC_DIR := src
 BIN_DIR := build
 OBJ_DIR := $(BIN_DIR)/obj
 
-EXE := $(BIN_DIR)/hellomake
+EXE := $(BIN_DIR)/dedit
 SRC := $(wildcard $(SRC_DIR)/*.c)
 OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 

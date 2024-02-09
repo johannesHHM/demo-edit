@@ -1,6 +1,5 @@
 #include "../inc/demo.h"
 #include "../inc/huffman.h"
-#include "../inc/pack.h"
 
 #include <stdio.h>
 #include <stdlib.h>
