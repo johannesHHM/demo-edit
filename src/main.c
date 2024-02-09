@@ -136,10 +136,12 @@ int main()
     {
         if (dd.chunks[i].type == DEMOTICK)
         {
+            printdemotick(dd.chunks[i].data.tick);
             writedemotick(op, dd.chunks[i].data.tick, dh.version);
         }
         else if (dd.chunks[i].type == DEMOSNAP)
         {
+            printdemosnap(dd.chunks[i].data.snap);
             demosnap *snap = dd.chunks[i].data.snap;
             for (int y = 0; y < snap->numitems; y++)
             {

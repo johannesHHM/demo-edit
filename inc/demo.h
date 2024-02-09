@@ -95,6 +95,14 @@ typedef struct
     demochunk *chunks;
 } demodata;
 
+typedef struct
+{
+    demoheader *header;
+    demotimeline *timeline;
+    demomap *map;
+    demodata *data;
+} demo;
+
 /* Read demo header from demofile into given demoheader */
 /* Returns a positive number on success, negative on fail */
 int readdemoheader(FILE *demofile, demoheader *header);
@@ -124,4 +132,9 @@ int writedemotick(FILE *outfile, demotick *tick, unsigned char version);
 int writedemosnap(FILE *outfile, demosnap *snap, unsigned char version);
 int writedemomessage(FILE *outfile, demomessage *message, unsigned char ver);
 int writedemodelta(FILE *outfile, demodelta *delta, unsigned char ver);
+
+void printdemoheader(demoheader *header);
+void printdemotick(demotick *tick);
+void printdemosnap(demosnap *snap);
+
 #endif // DEMO_H

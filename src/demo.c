@@ -234,20 +234,6 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
             {
                 chunk->type = DEMOSNAP;
                 chunk->data.snap = snap;
-
-                printf("SNAPSHOT={datasize: %d, numitems: %d, offsets: [ ", snap->datasize, snap->numitems);
-                for (int i = 0; i < snap->numitems; i++)
-                    printf("%d, ", snap->offsets[i]);
-
-                printf("], items: [ ");
-                for (int i = 0; i < snap->numitems; i++)
-                {
-                    printf("(type: %d, id: %d) { ", snap->items[i].type, snap->items[i].id);
-                    for (int y = 0; y < snap->items[i].numdata; y++)
-                        printf("%i, ", snap->items[i].data[y]);
-                    printf("} ");
-                }
-                printf("], ");
             }
             else
             {
@@ -479,4 +465,27 @@ void printdemoheader(demoheader *header)
     printf("type: %s\n", header->type);
     printf("length: %d\n", header->length);
     printf("timestamp: %s\n", header->timestamp);
+}
+
+void printdemotick(demotick *tick)
+{
+    printf("TICK={keyframe: %s, innline: %s, delta: %d}\n", tick->keyframe ? "true" : "false",
+           tick->innline ? "true" : "false", tick->delta);
+}
+
+void printdemosnap(demosnap *snap)
+{
+    printf("SNAPSHOT={datasize: %d, numitems: %d,\n  offsets: [ ", snap->datasize, snap->numitems);
+    for (int i = 0; i < snap->numitems; i++)
+        printf("%d, ", snap->offsets[i]);
+
+    printf("],\n  items: [\n");
+    for (int i = 0; i < snap->numitems; i++)
+    {
+        printf("    (type: %d, id: %d) {", snap->items[i].type, snap->items[i].id);
+        for (int y = 0; y < snap->items[i].numdata; y++)
+            printf("%x%s", snap->items[i].data[y], (y != snap->items[i].numdata - 1) ? "," : "");
+        printf("}\n");
+    }
+    printf("]}\n");
 }
