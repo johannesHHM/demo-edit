@@ -120,7 +120,7 @@ int main()
     demo d;
 
     readdemo(fp, &d);
-    printdemo(&d);
+    printdemo(&d, 0);
     writedemo(op, &d);
 
     fclose(fp);

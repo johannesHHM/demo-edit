@@ -137,6 +137,7 @@ int readdemo(FILE *demofile, demo *demo);
 int writedemo(FILE *outfile, demo *demo);
 
 /* Prints given demo file */
-void printdemo(demo *demo);
+/* if printchunks then print all chunks */
+void printdemo(demo *demo, char printchunks);
 
 #endif // DEMO_H

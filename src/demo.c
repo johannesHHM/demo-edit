@@ -549,10 +549,14 @@ void printdemodelta(demodelta *delta)
     printf("DELTA={datasize: %d}\n", delta->datasize);
 }
 
-void printdemo(demo *demo)
+void printdemo(demo *demo, char printchunks)
 {
+    printf("HEADER:\n");
     printdemoheader(&demo->header);
-    printf("numchunks: %d\n\n", demo->data.numchunks);
+    printf("\n");
+
+    if (printchunks)
+        printf("CHUNKS:\n");
 
     int typecount[4] = {0, 0, 0, 0};
     for (int i = 0; i < demo->data.numchunks; i++)
@@ -561,19 +565,23 @@ void printdemo(demo *demo)
         switch (chunk->type)
         {
         case DEMOTICK:
-            printdemotick(chunk->data.tick);
+            if (printchunks)
+                printdemotick(chunk->data.tick);
             typecount[(int)DEMOTICK]++;
             break;
         case DEMOSNAP:
-            printdemosnap(chunk->data.snap);
+            if (printchunks)
+                printdemosnap(chunk->data.snap);
             typecount[(int)DEMOSNAP]++;
             break;
         case DEMOMESSAGE:
-            printdemomessage(chunk->data.message);
+            if (printchunks)
+                printdemomessage(chunk->data.message);
             typecount[(int)DEMOMESSAGE]++;
             break;
         case DEMODELTA:
-            printdemodelta(chunk->data.delta);
+            if (printchunks)
+                printdemodelta(chunk->data.delta);   
             typecount[(int)DEMODELTA]++;
             break;
         default:
@@ -581,8 +589,11 @@ void printdemo(demo *demo)
             break;
         }
     }
+    if (printchunks)
+        printf("\n");
 
-    printf("\nchunks: %d\n", demo->data.numchunks);
+    printf("CHUNK INFO:\n");
+    printf("chunk count: %d\n", demo->data.numchunks);
     printf("chunk counts: [\n");
     printf("  ticks: %d\n", typecount[0]);
     printf("  snaps: %d\n", typecount[1]);
