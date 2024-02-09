@@ -243,7 +243,6 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
         }
         else if (type == DEMOMESSAGE)
         {
-            printf("MESSAGE={");
             demomessage *message = (demomessage *)malloc(sizeof(demomessage));
             readdemomessage(fp, message, size);
             chunk->type = DEMOMESSAGE;
@@ -251,7 +250,6 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
         }
         else if (type == DEMODELTA)
         {
-            printf("SNAPSHOT_DELTA={");
             demodelta *delta = (demodelta *)malloc(sizeof(demodelta));
             readdemodelta(fp, delta, size);
             chunk->type = DEMODELTA;
@@ -261,8 +259,6 @@ int readdemochunk(FILE *fp, demochunk *chunk, unsigned char ver)
         {
             printf("[ ERROR ] unknown chunk type!\n");
         }
-
-        printf("size: %d}\n", size);
     }
     return 1;
 }
@@ -283,8 +279,23 @@ int readdemochunks(FILE *fp, demodata *dd, unsigned char ver)
         }
     }
 
-    printf("numchunks: %d\n", dd->numchunks);
     dd->chunks = (demochunk *)realloc(dd->chunks, dd->numchunks * sizeof(demochunk));
+
+    return 1;
+}
+
+int readdemo(FILE *fp, demo *demo)
+{
+    if (readdemoheader(fp, &demo->header) <= 0)
+        return -1;
+
+    if (readdemotimeline(fp, &demo->timeline) <= 0)
+        return -2;
+
+    if (readdemomap(fp, &demo->map, demo->header.mapsize, demo->header.version) <= 0)
+        return -3;
+
+    readdemochunks(fp, &demo->data, demo->header.version);
 
     return 1;
 }
@@ -403,7 +414,7 @@ int writedemotick(FILE *fp, demotick *tick, unsigned char ver)
     return 1;
 }
 
-int writedemosnap(FILE *fp, demosnap *snap, unsigned char ver)
+int writedemosnap(FILE *fp, demosnap *snap)
 {
     char compressed[64 * 1024];
     char decompressed[64 * 1024];
@@ -427,7 +438,6 @@ int writedemosnap(FILE *fp, demosnap *snap, unsigned char ver)
     int size = cp - decompressed;
 
     int datasize = compresshuff(decompressed, size, compressed, 64 * 1024);
-    // datasize = ((datasize + 3) / 4) * 4;
 
     writedemochunkheader(fp, DEMOSNAP, datasize);
     fwrite(compressed, 1, datasize, fp);
@@ -435,7 +445,7 @@ int writedemosnap(FILE *fp, demosnap *snap, unsigned char ver)
     return 1;
 }
 
-int writedemomessage(FILE *fp, demomessage *message, unsigned char ver)
+int writedemomessage(FILE *fp, demomessage *message)
 {
     writedemochunkheader(fp, DEMOMESSAGE, message->datasize);
     fwrite(message->data, 1, message->datasize, fp);
@@ -443,13 +453,52 @@ int writedemomessage(FILE *fp, demomessage *message, unsigned char ver)
     return 1;
 }
 
-int writedemodelta(FILE *fp, demodelta *delta, unsigned char ver)
+int writedemodelta(FILE *fp, demodelta *delta)
 {
     writedemochunkheader(fp, DEMODELTA, delta->datasize);
     fwrite(delta->data, 1, delta->datasize, fp);
 
     return 1;
 }
+
+int writedemo(FILE *fp, demo *demo)
+{
+    if (writedemoheader(fp, &demo->header) <= 0)
+        return -1;
+
+    if (writedemotimeline(fp, &demo->timeline) <= 0)
+        return -2;
+
+    if (writedemomap(fp, &demo->map, demo->header.mapsize, demo->header.version) <= 0)
+        return -3;
+
+    for (int i = 0; i < demo->data.numchunks; i++)
+    {
+        demochunk *chunk = &demo->data.chunks[i];
+        switch (chunk->type)
+        {
+        case DEMOTICK:
+            writedemotick(fp, chunk->data.tick, demo->header.version);
+            break;
+        case DEMOSNAP:
+            writedemosnap(fp, chunk->data.snap);
+            break;
+        case DEMOMESSAGE:
+            writedemomessage(fp, chunk->data.message);
+            break;
+        case DEMODELTA:
+            writedemodelta(fp, chunk->data.delta);
+            break;
+        default:
+            printf("UNKNOWN CHUNK\n");
+            break;
+        }
+    }
+
+    return 1;
+}
+
+/* printers */
 
 void printdemoheader(demoheader *header)
 {
@@ -477,7 +526,7 @@ void printdemosnap(demosnap *snap)
 {
     printf("SNAPSHOT={datasize: %d, numitems: %d,\n  offsets: [ ", snap->datasize, snap->numitems);
     for (int i = 0; i < snap->numitems; i++)
-        printf("%d, ", snap->offsets[i]);
+        printf("%d%s ", snap->offsets[i], (i != snap->numitems - 1) ? "," : "");
 
     printf("],\n  items: [\n");
     for (int i = 0; i < snap->numitems; i++)
@@ -488,4 +537,56 @@ void printdemosnap(demosnap *snap)
         printf("}\n");
     }
     printf("]}\n");
+}
+
+void printdemomessage(demomessage *message)
+{
+    printf("MESSAGE={datasize: %d}\n", message->datasize);
+}
+
+void printdemodelta(demodelta *delta)
+{
+    printf("DELTA={datasize: %d}\n", delta->datasize);
+}
+
+void printdemo(demo *demo)
+{
+    printdemoheader(&demo->header);
+    printf("numchunks: %d\n\n", demo->data.numchunks);
+
+    int typecount[4] = {0, 0, 0, 0};
+    for (int i = 0; i < demo->data.numchunks; i++)
+    {
+        demochunk *chunk = &demo->data.chunks[i];
+        switch (chunk->type)
+        {
+        case DEMOTICK:
+            printdemotick(chunk->data.tick);
+            typecount[(int)DEMOTICK]++;
+            break;
+        case DEMOSNAP:
+            printdemosnap(chunk->data.snap);
+            typecount[(int)DEMOSNAP]++;
+            break;
+        case DEMOMESSAGE:
+            printdemomessage(chunk->data.message);
+            typecount[(int)DEMOMESSAGE]++;
+            break;
+        case DEMODELTA:
+            printdemodelta(chunk->data.delta);
+            typecount[(int)DEMODELTA]++;
+            break;
+        default:
+            printf("UNKNOWN CHUNK\n");
+            break;
+        }
+    }
+
+    printf("\nchunks: %d\n", demo->data.numchunks);
+    printf("chunk counts: [\n");
+    printf("  ticks: %d\n", typecount[0]);
+    printf("  snaps: %d\n", typecount[1]);
+    printf("  messages: %d\n", typecount[2]);
+    printf("  deltas: %d\n", typecount[3]);
+    printf("]\n");
 }

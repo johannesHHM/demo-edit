@@ -97,10 +97,10 @@ typedef struct
 
 typedef struct
 {
-    demoheader *header;
-    demotimeline *timeline;
-    demomap *map;
-    demodata *data;
+    demoheader header;
+    demotimeline timeline;
+    demomap map;
+    demodata data;
 } demo;
 
 /* Read demo header from demofile into given demoheader */
@@ -122,19 +122,21 @@ int readdemomap(FILE *demofile, demomap *map, int mapsize, unsigned char version
 /* Will allocate memory if chunk is snap, delta or message */
 int readdemochunk(FILE *demofile, demochunk *chunk, unsigned char version);
 
-int readdemochunks(FILE *fp, demodata *dd, unsigned char ver);
+/* Reads all chunks from demofile */
+/* Returns a positive number on success, negative on error */
+/* Will allocate the needed memory for data */
+int readdemochunks(FILE *demofile, demodata *data, unsigned char version);
 
-int writedemoheader(FILE *outfile, demoheader *header);
-int writedemotimeline(FILE *outfile, demotimeline *timeline);
-int writedemomap(FILE *outfile, demomap *map, int mapsize, unsigned char version);
+/* Reads a demo file from demofile */
+/* Returns a positive number on success, negative on error */
+/* Allocates memory needed in demo map and data */
+int readdemo(FILE *demofile, demo *demo);
 
-int writedemotick(FILE *outfile, demotick *tick, unsigned char version);
-int writedemosnap(FILE *outfile, demosnap *snap, unsigned char version);
-int writedemomessage(FILE *outfile, demomessage *message, unsigned char ver);
-int writedemodelta(FILE *outfile, demodelta *delta, unsigned char ver);
+/* Writes given demo file to outfile */
+/* Returns a positive number on success, negative on error */
+int writedemo(FILE *outfile, demo *demo);
 
-void printdemoheader(demoheader *header);
-void printdemotick(demotick *tick);
-void printdemosnap(demosnap *snap);
+/* Prints given demo file */
+void printdemo(demo *demo);
 
 #endif // DEMO_H

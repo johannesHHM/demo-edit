@@ -117,56 +117,16 @@ int main()
     FILE *fp = fopen("data/test.demo", "r");
     FILE *op = fopen("data/out.demo", "w");
 
-    demoheader dh;
-    demotimeline dt;
-    demomap dm;
-    demodata dd;
+    demo d;
 
-    readdemoheader(fp, &dh);
-    readdemotimeline(fp, &dt);
-    readdemomap(fp, &dm, dh.mapsize, dh.version);
-
-    writedemoheader(op, &dh);
-    writedemotimeline(op, &dt);
-    writedemomap(op, &dm, dh.mapsize, dh.version);
-
-    readdemochunks(fp, &dd, dh.version);
-
-    for (int i = 0; i < dd.numchunks; i++)
-    {
-        if (dd.chunks[i].type == DEMOTICK)
-        {
-            printdemotick(dd.chunks[i].data.tick);
-            writedemotick(op, dd.chunks[i].data.tick, dh.version);
-        }
-        else if (dd.chunks[i].type == DEMOSNAP)
-        {
-            printdemosnap(dd.chunks[i].data.snap);
-            demosnap *snap = dd.chunks[i].data.snap;
-            for (int y = 0; y < snap->numitems; y++)
-            {
-                demosnapitem *item = &snap->items[y];
-                if (item->type == 11 && item->id == 9)
-                {
-                    char newname[16] = ">>Hextcjd!\0";
-
-                    strtoint(newname, 16, item->data);
-                }
-            }
-            writedemosnap(op, dd.chunks[i].data.snap, dh.version);
-        }
-        else if (dd.chunks[i].type == DEMOMESSAGE)
-        {
-            writedemomessage(op, dd.chunks[i].data.message, dh.version);
-        }
-        else if (dd.chunks[i].type == DEMODELTA)
-        {
-            writedemodelta(op, dd.chunks[i].data.delta, dh.version);
-        }
-    }
+    readdemo(fp, &d);
+    printdemo(&d);
+    writedemo(op, &d);
 
     fclose(fp);
     fclose(op);
+
+    exit(EXIT_SUCCESS);
 
     // Testing
     /*
