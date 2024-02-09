@@ -106,3 +106,36 @@ void writeint(int i, char **cp)
         (*cp)++;
     }
 }
+
+void intstostr(const int *ints, int num, char *str)
+{
+    while (num)
+    {
+        str[0] = (((*ints) >> 24) & 0xff) - 128;
+        str[1] = (((*ints) >> 16) & 0xff) - 128;
+        str[2] = (((*ints) >> 8) & 0xff) - 128;
+        str[3] = ((*ints) & 0xff) - 128;
+        str += 4;
+        ints++;
+        num--;
+    }
+}
+
+void strtoint(const char *str, int num, int *ints)
+{
+    int intloc = 3;
+    *ints = 0;
+    while (num)
+    {
+        if (intloc < 0)
+        {
+            ints++;
+            *ints = 0;
+            intloc = 3;
+        }
+        *ints |= (*str + 128) << (8 * intloc);
+        str++;
+        intloc--;
+        num--;
+    }
+}

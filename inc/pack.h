@@ -17,4 +17,10 @@ int readint(char **cp);
 /* the given pointer is incremented */
 void writeint(int in, char **cp);
 
+/* reads a teworlds string from given ints */
+void intstostr(const int *ints, int num, char *str);
+
+/* writes a teeworlds string into ints */
+void strtoint(const char *str, int num, int *ints);
+
 #endif // PACK_H
