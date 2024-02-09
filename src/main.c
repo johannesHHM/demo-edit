@@ -140,8 +140,26 @@ int main()
         }
         else if (dd.chunks[i].type == DEMOSNAP)
         {
+            demosnap *snap = dd.chunks[i].data.snap;
+            for (int y = 0; y < snap->numitems; y++)
+            {
+                demosnapitem *item = &snap->items[y];
+                if (item->type == 11 && item->id == 9)
+                {
+                    char newname[16] = ">>Hextcjd!\0";
+
+                    strtoint(newname, 16, item->data);
+                }
+            }
             writedemosnap(op, dd.chunks[i].data.snap, dh.version);
-            exit(0);
+        }
+        else if (dd.chunks[i].type == DEMOMESSAGE)
+        {
+            writedemomessage(op, dd.chunks[i].data.message, dh.version);
+        }
+        else if (dd.chunks[i].type == DEMODELTA)
+        {
+            writedemodelta(op, dd.chunks[i].data.delta, dh.version);
         }
     }
 

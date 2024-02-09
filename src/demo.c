@@ -54,14 +54,6 @@ int readdemoheader(FILE *fp, demoheader *dh)
     if (fread(dh->timestamp, 1, 20, fp) != 20)
         return -9;
 
-    printf("version: %hhu\n", dh->version);
-    printf("net_version: %s\n", dh->netversion);
-    printf("mapname: %s\n", dh->mapname);
-    printf("mapsize: %d\n", dh->mapsize);
-    printf("mapcrc: %d\n", dh->mapcrc);
-    printf("type: %s\n", dh->type);
-    printf("length: %d\n", dh->length);
-    printf("timestamp: %s\n", dh->timestamp);
     return 1;
 }
 
@@ -449,10 +441,42 @@ int writedemosnap(FILE *fp, demosnap *snap, unsigned char ver)
     int size = cp - decompressed;
 
     int datasize = compresshuff(decompressed, size, compressed, 64 * 1024);
-    datasize = ((datasize + 3) / 4) * 4;
+    // datasize = ((datasize + 3) / 4) * 4;
 
     writedemochunkheader(fp, DEMOSNAP, datasize);
     fwrite(compressed, 1, datasize, fp);
 
     return 1;
+}
+
+int writedemomessage(FILE *fp, demomessage *message, unsigned char ver)
+{
+    writedemochunkheader(fp, DEMOMESSAGE, message->datasize);
+    fwrite(message->data, 1, message->datasize, fp);
+
+    return 1;
+}
+
+int writedemodelta(FILE *fp, demodelta *delta, unsigned char ver)
+{
+    writedemochunkheader(fp, DEMODELTA, delta->datasize);
+    fwrite(delta->data, 1, delta->datasize, fp);
+
+    return 1;
+}
+
+void printdemoheader(demoheader *header)
+{
+    if (header->version == 6)
+        printf("version: v6ddnet\n");
+    else
+        printf("version: v%d\n", header->version);
+
+    printf("netversion: %s\n", header->netversion);
+    printf("mapname: %s\n", header->mapname);
+    printf("mapsize: %d\n", header->mapsize);
+    printf("mapcrc: %d\n", header->mapcrc);
+    printf("type: %s\n", header->type);
+    printf("length: %d\n", header->length);
+    printf("timestamp: %s\n", header->timestamp);
 }

@@ -122,5 +122,6 @@ int writedemomap(FILE *outfile, demomap *map, int mapsize, unsigned char version
 
 int writedemotick(FILE *outfile, demotick *tick, unsigned char version);
 int writedemosnap(FILE *outfile, demosnap *snap, unsigned char version);
-
+int writedemomessage(FILE *outfile, demomessage *message, unsigned char ver);
+int writedemodelta(FILE *outfile, demodelta *delta, unsigned char ver);
 #endif // DEMO_H
