@@ -1,5 +1,6 @@
 #include "../inc/demo.h"
 #include "../inc/huffman.h"
+#include "../inc/commands.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -119,7 +120,18 @@ int main()
     demo d;
 
     readdemo(fp, &d);
-    printdemo(&d, 0);
+    
+    // printdemo(&d, 1);
+
+    int retid = setnamebyid(1, "NamedByID", &d);
+    int retname = setnamebyname("New Hero", "NamedByName", &d);
+    
+    //TODO quirk, when doing further edits keep previous ones in mind
+    int retskin = setskinbyname("NamedByName", "bomb", &d);
+
+    printf("id: %d name: %d\n", retid, retname);
+    printf("skin: %d\n", retskin);
+
     writedemo(op, &d);
 
     fclose(fp);

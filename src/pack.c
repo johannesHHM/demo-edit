@@ -119,6 +119,7 @@ void intstostr(const int *ints, int num, char *str)
         ints++;
         num--;
     }
+    str[-1] = 0;
 }
 
 void strtoint(const char *str, int num, int *ints)
