@@ -139,6 +139,7 @@ int main()
 
     // TODO quirk, when doing further edits keep previous ones in mind
     int retskin = setskinbyname("New Santa", "santa_coala", &d);
+    setskinbyid(9, "bomb", &d);
 
     int retmap = changemap(mp, "pepeg", &d);
 

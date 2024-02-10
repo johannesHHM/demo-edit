@@ -69,6 +69,35 @@ int setnamebyname(char *old, char *new, demo *demo)
     return found;
 }
 
+int setskinbyid(int id, char *skin, demo *demo)
+{
+    int skinlen = strlen(skin);
+    if (skinlen >= 23)
+        return -1;
+
+    int intskin[5] = {0x80808080, 0x80808080, 0x80808080, 0x80808080, 0x80808000};
+    strtoint(skin, skinlen + 1, intskin);
+    char found = 0;
+
+    for (int i = 0; i < demo->data.numchunks; i++)
+    {
+        if (demo->data.chunks[i].type != DEMOSNAP)
+            continue;
+        demosnap *snap = demo->data.chunks[i].data.snap;
+
+        for (int y = 0; y < snap->numitems; y++)
+        {
+            demosnapitem *item = &snap->items[y];
+            if (item->type == 11 && item->id == id)
+            {
+                memcpy(&item->data[8], intskin, 5 * sizeof(int));
+                found++;
+            }
+        }
+    }
+    return found;
+}
+
 int setskinbyname(char *name, char *skin, demo *demo)
 {
     int skinlen = strlen(skin);

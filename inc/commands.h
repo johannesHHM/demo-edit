@@ -6,6 +6,7 @@
 int setnamebyid(int id, char *newname, demo *demo);
 int setnamebyname(char *oldname, char *newname, demo *demo);
 
+int setskinbyid(int id, char *skin, demo *demo);
 int setskinbyname(char *name, char *skin, demo *demo);
 
 int changemap(FILE *map, char *mapname, demo *demo);
