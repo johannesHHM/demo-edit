@@ -140,4 +140,8 @@ int writedemo(FILE *outfile, demo *demo);
 /* if printchunks then print all chunks */
 void printdemo(demo *demo, char printchunks);
 
+/* Frees everything for demo */
+/* Sets demo to NULL */
+void freedemo(demo *demo);
+
 #endif // DEMO_H

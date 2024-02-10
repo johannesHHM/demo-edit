@@ -18,6 +18,41 @@ const char headermagic[7] = "TWDEMO\0";
 const unsigned char mapmagic[] = {0x6b, 0xe6, 0xda, 0x4a, 0xce, 0xbd, 0x38, 0x0c,
                                   0x9b, 0x5b, 0x12, 0x89, 0xc8, 0x42, 0xd7, 0x80};
 
+void freedemo(demo *demo)
+{
+    free(demo->map.data);
+    
+    for(int i = 0; i < demo->data.numchunks; i++)
+    {
+        demochunk *chunk = &demo->data.chunks[i];
+        switch (chunk->type)
+        {
+        case DEMOTICK:
+            free(chunk->data.tick);
+            break;
+        case DEMOSNAP:
+            for (int y = 0; y < chunk->data.snap->numitems; y++)
+                free(chunk->data.snap->items[y].data);
+            free(chunk->data.snap->offsets);
+            free(chunk->data.snap->items);
+            free(chunk->data.snap);
+            break;
+        case DEMOMESSAGE:
+            free(chunk->data.message->data);
+            free(chunk->data.message);
+            break;
+        case DEMODELTA:
+            free(chunk->data.delta->data);
+            free(chunk->data.delta);
+            break;
+        default:
+            break;
+        }
+    }
+    free(demo->data.chunks);
+
+}
+
 /* readers */
 
 int readdemoheader(FILE *fp, demoheader *dh)

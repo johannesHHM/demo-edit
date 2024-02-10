@@ -1,6 +1,6 @@
+#include "../inc/commands.h"
 #include "../inc/demo.h"
 #include "../inc/huffman.h"
-#include "../inc/commands.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,28 +114,47 @@ int main()
 {
     inithuff(NULL);
 
+    // FILE *fp = fopen("/home/johannes/.local/share/ddnet/demos/auto/pepeg_2024-02-09_20-35-38.demo", "r");
     FILE *fp = fopen("data/test.demo", "r");
     FILE *op = fopen("data/out.demo", "w");
+    FILE *mp = fopen("data/fngsnow.map", "r");
 
     demo d;
 
     readdemo(fp, &d);
-    
+
     // printdemo(&d, 1);
 
     int retid = setnamebyid(1, "NamedByID", &d);
-    int retname = setnamebyname("New Hero", "NamedByName", &d);
     
-    //TODO quirk, when doing further edits keep previous ones in mind
-    int retskin = setskinbyname("NamedByName", "bomb", &d);
+    setnamebyid(8, "Elf Two", &d);
+    setnamebyid(3, "Elf One", &d);
+    
+    setnamebyid(7, "Santas Cat", &d);
+    
+    setskinbyname("Elf One", "santa_default", &d);
+    setskinbyname("Elf Two", "santa_default", &d);
+
+    int retname = setnamebyname("New Hero", "New Santa", &d);
+
+    // TODO quirk, when doing further edits keep previous ones in mind
+    int retskin = setskinbyname("New Santa", "santa_coala", &d);
+
+    int retmap = changemap(mp, "pepeg", &d);
+
 
     printf("id: %d name: %d\n", retid, retname);
-    printf("skin: %d\n", retskin);
+    printf("skin: %d, map: %d\n", retskin, retmap);
 
     writedemo(op, &d);
 
+    printdemo(&d, 0);
+
+    freedemo(&d);
+
     fclose(fp);
     fclose(op);
+    fclose(mp);
 
     exit(EXIT_SUCCESS);
 
