@@ -148,11 +148,19 @@ int changemap(FILE *map, char *mapname, demo *demo)
         return -1;
 
     fread(mapbuff, 1, mapsize, map);
+    
+    if (memcmp(mapbuff, "DATA", 4) != 0)
+    {
+        free(mapbuff);
+        return -1;
+    }
 
     free(demo->map.data);
     demo->map.data = mapbuff;
     
-    demo->header.version = 5;
+    if (demo->header.version >= 6)
+        demo->header.version = 5;
+
     demo->header.mapsize = mapsize;
     demo->header.mapcrc = mapsize;
     memcpy(demo->header.mapname, mapname, namelen + 1);
