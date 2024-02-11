@@ -5,7 +5,7 @@
 
 #define MAX_COMMANDS 64
 
-typedef struct 
+typedef struct
 {
     char *demopath;
     char *mappath;

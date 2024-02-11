@@ -21,8 +21,8 @@ const unsigned char mapmagic[] = {0x6b, 0xe6, 0xda, 0x4a, 0xce, 0xbd, 0x38, 0x0c
 void freedemo(demo *demo)
 {
     free(demo->map.data);
-    
-    for(int i = 0; i < demo->data.numchunks; i++)
+
+    for (int i = 0; i < demo->data.numchunks; i++)
     {
         demochunk *chunk = &demo->data.chunks[i];
         switch (chunk->type)
@@ -50,7 +50,6 @@ void freedemo(demo *demo)
         }
     }
     free(demo->data.chunks);
-
 }
 
 /* readers */

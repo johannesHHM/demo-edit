@@ -1,7 +1,7 @@
+#include "../inc/args.h"
 #include "../inc/commands.h"
 #include "../inc/demo.h"
 #include "../inc/huffman.h"
-#include "../inc/args.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -127,7 +127,7 @@ int mapname(char *mappath, char *out)
         }
         i++;
     }
-    
+
     if ((end - start) > 31)
         return 0;
 
@@ -146,20 +146,20 @@ void run(input *in)
 {
     if (!in->demopath)
         exit(EXIT_FAILURE);
-    
+
     FILE *demofile, *outfile, *mapfile, *exmapfile;
     demofile = NULL;
     outfile = NULL;
     mapfile = NULL;
     exmapfile = NULL;
-    
+
     demofile = fopen(in->demopath, "r");
     if (!demofile)
     {
         perror("ERROR: Failed to open demo file, reason");
         exit(EXIT_FAILURE);
     }
-    
+
     if (in->outpath)
     {
         outfile = fopen(in->outpath, "w");
@@ -169,7 +169,7 @@ void run(input *in)
             exit(EXIT_FAILURE);
         }
     }
-    
+
     if (in->mappath)
     {
         mapfile = fopen(in->mappath, "r");
@@ -201,7 +201,7 @@ void run(input *in)
 
     if (in->print)
         printdemo(&dmo, 0);
-    
+
     if (mapfile)
     {
         char mname[32];
@@ -248,21 +248,22 @@ int main(int argc, char *argv[])
     input in;
 
     parseargs(&in, argc, argv);
-    
+
     /*
     printf("demopath: %s\n", in.demopath);
     printf("outpath: %s\n", in.outpath);
     printf("mappath: %s\n", in.mappath);
     printf("extractpath: %s\n", in.extractmap);
     printf("print: %d\n", in.print);
-    
+
     printf("\ncommands:\n");
     for (int i = 0; i < in.numcmds; i++)
     {
         cmdinput *c = &in.commands[i];
-        printf("command: {cmd: %c, type: %c, id: %d, from: %s, to: %s}\n", c->cmdtype, c->settype, c->id, c->from, c->to);
+        printf("command: {cmd: %c, type: %c, id: %d, from: %s, to: %s}\n", c->cmdtype, c->settype, c->id, c->from,
+    c->to);
     }
-    
+
     printf("\nEXITING SUCCESS\n");
     */
 
@@ -282,12 +283,12 @@ int main(int argc, char *argv[])
     // printdemo(&d, 1);
 
     int retid = setnamebyid(1, "NamedByID", &d);
-    
+
     setnamebyid(8, "Elf Two", &d);
     setnamebyid(3, "Elf One", &d);
-    
+
     setnamebyid(7, "Santas Cat", &d);
-    
+
     setskinbyname("Elf One", "santa_default", &d);
     setskinbyname("Elf Two", "santa_default", &d);
 
@@ -298,7 +299,6 @@ int main(int argc, char *argv[])
     setskinbyid(9, "bomb", &d);
 
     int retmap = changemap(mp, "pepeg", &d);
-
 
     printf("id: %d name: %d\n", retid, retname);
     printf("skin: %d, map: %d\n", retskin, retmap);

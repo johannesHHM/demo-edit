@@ -1,6 +1,6 @@
+#include "../inc/commands.h"
 #include "../inc/demo.h"
 #include "../inc/pack.h"
-#include "../inc/commands.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -142,7 +142,7 @@ int changemap(FILE *map, char *mapname, demo *demo)
     fseek(map, 0, SEEK_END);
     long mapsize = ftell(map);
     fseek(map, 0, SEEK_SET);
-    
+
     if (mapsize < 4)
         return -1;
 
@@ -151,7 +151,7 @@ int changemap(FILE *map, char *mapname, demo *demo)
         return -1;
 
     fread(mapbuff, 1, mapsize, map);
-    
+
     if (memcmp(mapbuff, "DATA", 4) != 0)
     {
         free(mapbuff);
@@ -160,7 +160,7 @@ int changemap(FILE *map, char *mapname, demo *demo)
 
     free(demo->map.data);
     demo->map.data = mapbuff;
-    
+
     if (demo->header.version >= 6)
         demo->header.version = 5;
 
@@ -173,10 +173,10 @@ int changemap(FILE *map, char *mapname, demo *demo)
 
 void runcommand(cmdinput *cmd, demo *demo)
 {
-    switch(cmd->cmdtype)
+    switch (cmd->cmdtype)
     {
     case 'n':
-        switch(cmd->settype)
+        switch (cmd->settype)
         {
         case 'i':
             if (setnamebyid(cmd->id, cmd->to, demo) < 0)
@@ -191,7 +191,7 @@ void runcommand(cmdinput *cmd, demo *demo)
         }
         break;
     case 's':
-        switch(cmd->settype)
+        switch (cmd->settype)
         {
         case 'i':
             if (setskinbyid(cmd->id, cmd->to, demo) < 0)

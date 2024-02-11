@@ -40,7 +40,7 @@ void parseargs(input *in, int argc, char *argv[])
     in->outpath = NULL;
     in->print = 0;
     in->extractmap = 0;
-    
+
     in->numcmds = 0;
 
     int argi;
@@ -77,7 +77,7 @@ void parseargs(input *in, int argc, char *argv[])
                 break;
             case 'o':
                 if (argi + 1 >= argc)
-                {    
+                {
                     fprintf(stderr, "ERROR: Flag 'o' requires additional argument\n");
                     exit(EXIT_FAILURE);
                 }
@@ -89,7 +89,7 @@ void parseargs(input *in, int argc, char *argv[])
                 break;
             case 'e':
                 if (argi + 1 >= argc)
-                {    
+                {
                     fprintf(stderr, "ERROR: Flag 'e' requires additional argument\n");
                     exit(EXIT_FAILURE);
                 }
@@ -98,7 +98,7 @@ void parseargs(input *in, int argc, char *argv[])
                 break;
             case 'm':
                 if (argi + 1 >= argc)
-                {    
+                {
                     fprintf(stderr, "ERROR: Flag 'm' requires additional argument\n");
                     exit(EXIT_FAILURE);
                 }
@@ -109,9 +109,9 @@ void parseargs(input *in, int argc, char *argv[])
                 fprintf(stderr, "ERROR: Unknown flag '%c'\n", argv[argi][1]);
                 exit(EXIT_FAILURE);
                 break;
-            }    
+            }
         }
-        else 
+        else
         {
             if (in->demopath)
             {
