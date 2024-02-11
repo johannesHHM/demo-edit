@@ -591,7 +591,6 @@ void printdemodelta(demodelta *delta)
 
 void printdemo(demo *demo, char printchunks)
 {
-    printf("HEADER:\n");
     printdemoheader(&demo->header);
     printf("\n");
 
@@ -632,7 +631,6 @@ void printdemo(demo *demo, char printchunks)
     if (printchunks)
         printf("\n");
 
-    printf("CHUNK INFO:\n");
     printf("chunk count: %d\n", demo->data.numchunks);
     printf("chunk counts: [\n");
     printf("  ticks: %d\n", typecount[0]);
