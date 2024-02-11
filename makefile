@@ -11,7 +11,7 @@ CFLAGS   := -Wall
 LDFLAGS  := -Llib
 LDLIBS   := -lm
 
-.PHONY: all clean run format
+.PHONY: all clean run format install
 
 all: $(EXE)
 
@@ -33,6 +33,9 @@ clean:
 format:
 	clang-format -i --style=Microsoft src/*.c
 	clang-format -i --style=Microsoft inc/*.h
+
+install: $(EXE)
+	cp $(EXE) ~/.local/bin
 
 
 -include $(OBJ:.o=.d)
