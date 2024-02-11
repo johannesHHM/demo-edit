@@ -1,6 +1,7 @@
 #include "../inc/commands.h"
 #include "../inc/demo.h"
 #include "../inc/huffman.h"
+#include "../inc/args.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -110,9 +111,164 @@ int testdecompress(char *line)
     return 1;
 }
 
-int main()
+int mapname(char *mappath, char *out)
+{
+    int start = 0;
+    int end;
+    int i = 0;
+    while (1)
+    {
+        if (mappath[i] == '/')
+            start = i + 1;
+        if (mappath[i] == '.' || mappath[i] == '\0')
+        {
+            end = i;
+            break;
+        }
+        i++;
+    }
+    
+    if ((end - start) > 31)
+        return 0;
+
+    i = 0;
+    while (start != end)
+    {
+        out[i] = mappath[start];
+        start++;
+        i++;
+    }
+    out[i] = '\0';
+    return 1;
+}
+
+void run(input *in)
+{
+    if (!in->demopath)
+        exit(EXIT_FAILURE);
+    
+    FILE *demofile, *outfile, *mapfile, *exmapfile;
+    demofile = NULL;
+    outfile = NULL;
+    mapfile = NULL;
+    exmapfile = NULL;
+    
+    demofile = fopen(in->demopath, "r");
+    if (!demofile)
+    {
+        perror("ERROR: Failed to open demo file, reason");
+        exit(EXIT_FAILURE);
+    }
+    
+    if (in->outpath)
+    {
+        outfile = fopen(in->outpath, "w");
+        if (!outfile)
+        {
+            perror("ERROR: Failed to open output file, reason");
+            exit(EXIT_FAILURE);
+        }
+    }
+    
+    if (in->mappath)
+    {
+        mapfile = fopen(in->mappath, "r");
+        if (!mapfile)
+        {
+            perror("ERROR: Failed to open map file, reason");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    if (in->extractmap)
+    {
+        exmapfile = fopen(in->extractmap, "r");
+        if (!exmapfile)
+        {
+            perror("ERROR: Failed to open extract map file, reason");
+            exit(EXIT_FAILURE);
+        }
+        // TODO extract map here
+    }
+
+    demo dmo;
+
+    if (readdemo(demofile, &dmo) < 0)
+    {
+        fprintf(stderr, "ERROR: Failed to parse demo\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (in->print)
+        printdemo(&dmo, 0);
+    
+    if (mapfile)
+    {
+        char mname[32];
+        if (mapname(in->mappath, mname))
+        {
+            if (changemap(mapfile, mname, &dmo) < 0)
+            {
+                fprintf(stderr, "ERROR: Failed to set map '%s'\n", in->mappath);
+                exit(EXIT_FAILURE);
+            }
+        }
+        else
+        {
+            fprintf(stderr, "ERROR: Given map has too long name (must be < 32)\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    for (int i = 0; i < in->numcmds; i++)
+    {
+        runcommand(&in->commands[i], &dmo);
+    }
+
+    if (outfile)
+    {
+        if (writedemo(outfile, &dmo) < 0)
+        {
+            fprintf(stderr, "ERROR: Failed to write demo to '%s'\n", in->outpath);
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+
+int main(int argc, char *argv[])
 {
     inithuff(NULL);
+
+    if (argc == 1)
+    {
+        printf("HELP! This should help you.\n");
+        exit(EXIT_SUCCESS);
+    }
+
+    input in;
+
+    parseargs(&in, argc, argv);
+    
+    /*
+    printf("demopath: %s\n", in.demopath);
+    printf("outpath: %s\n", in.outpath);
+    printf("mappath: %s\n", in.mappath);
+    printf("extractpath: %s\n", in.extractmap);
+    printf("print: %d\n", in.print);
+    
+    printf("\ncommands:\n");
+    for (int i = 0; i < in.numcmds; i++)
+    {
+        cmdinput *c = &in.commands[i];
+        printf("command: {cmd: %c, type: %c, id: %d, from: %s, to: %s}\n", c->cmdtype, c->settype, c->id, c->from, c->to);
+    }
+    
+    printf("\nEXITING SUCCESS\n");
+    */
+
+    run(&in);
+
+    exit(EXIT_SUCCESS);
 
     // FILE *fp = fopen("/home/johannes/.local/share/ddnet/demos/auto/pepeg_2024-02-09_20-35-38.demo", "r");
     FILE *fp = fopen("data/test.demo", "r");

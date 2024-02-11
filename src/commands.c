@@ -1,5 +1,6 @@
 #include "../inc/demo.h"
 #include "../inc/pack.h"
+#include "../inc/commands.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -122,7 +123,6 @@ int setskinbyname(char *name, char *skin, demo *demo)
 
             char iname[16];
             intstostr(item->data, 4, iname);
-            printf("comparing: %s : %s\n", name, iname);
             if (strcmp(name, iname) == 0)
             {
                 memcpy(&item->data[8], intskin, 5 * sizeof(int));
@@ -142,6 +142,9 @@ int changemap(FILE *map, char *mapname, demo *demo)
     fseek(map, 0, SEEK_END);
     long mapsize = ftell(map);
     fseek(map, 0, SEEK_SET);
+    
+    if (mapsize < 4)
+        return -1;
 
     char *mapbuff = (char *)malloc(mapsize);
     if (mapbuff == NULL)
@@ -166,4 +169,44 @@ int changemap(FILE *map, char *mapname, demo *demo)
     memcpy(demo->header.mapname, mapname, namelen + 1);
 
     return 1;
+}
+
+void runcommand(cmdinput *cmd, demo *demo)
+{
+    switch(cmd->cmdtype)
+    {
+    case 'n':
+        switch(cmd->settype)
+        {
+        case 'i':
+            if (setnamebyid(cmd->id, cmd->to, demo) < 0)
+                printf("WARNING: Could not set name '%s' because it exeeds max limit of 15 characters\n", cmd->to);
+            break;
+        case 'n':
+            if (setnamebyname(cmd->from, cmd->to, demo) < 0)
+                printf("WARNING: Could not set name '%s' because it exeeds max limit of 15 characters\n", cmd->to);
+            break;
+        default:
+            printf("WARNING: Unknown modifier for name\n");
+        }
+        break;
+    case 's':
+        switch(cmd->settype)
+        {
+        case 'i':
+            if (setskinbyid(cmd->id, cmd->to, demo) < 0)
+                printf("WARNING: Could not set skin '%s' because it exeeds max limit of 23 characters\n", cmd->to);
+            break;
+        case 'n':
+            if (setskinbyname(cmd->from, cmd->to, demo) < 0)
+                printf("WARNING: Could not set skin '%s' because it exeeds max limit of 23 characters\n", cmd->to);
+            break;
+        default:
+            printf("WARNING: Unknown modifier for skin\n");
+        }
+        break;
+    default:
+        printf("WARNING: Unknown command type\n");
+        break;
+    }
 }
