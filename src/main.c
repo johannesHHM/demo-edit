@@ -233,6 +233,15 @@ void run(input *in)
             exit(EXIT_FAILURE);
         }
     }
+
+    if (demofile)
+        freedemo(&dmo);
+
+}
+
+void printhelp()
+{
+    printf("HELP! I hope this helped you.\n");
 }
 
 int main(int argc, char *argv[])
@@ -241,7 +250,7 @@ int main(int argc, char *argv[])
 
     if (argc == 1)
     {
-        printf("HELP! This should help you.\n");
+        printhelp();
         exit(EXIT_SUCCESS);
     }
 
@@ -268,50 +277,6 @@ int main(int argc, char *argv[])
     */
 
     run(&in);
-
-    exit(EXIT_SUCCESS);
-
-    // FILE *fp = fopen("/home/johannes/.local/share/ddnet/demos/auto/pepeg_2024-02-09_20-35-38.demo", "r");
-    FILE *fp = fopen("data/test.demo", "r");
-    FILE *op = fopen("data/out.demo", "w");
-    FILE *mp = fopen("data/fngsnow.map", "r");
-
-    demo d;
-
-    readdemo(fp, &d);
-
-    // printdemo(&d, 1);
-
-    int retid = setnamebyid(1, "NamedByID", &d);
-
-    setnamebyid(8, "Elf Two", &d);
-    setnamebyid(3, "Elf One", &d);
-
-    setnamebyid(7, "Santas Cat", &d);
-
-    setskinbyname("Elf One", "santa_default", &d);
-    setskinbyname("Elf Two", "santa_default", &d);
-
-    int retname = setnamebyname("New Hero", "New Santa", &d);
-
-    // TODO quirk, when doing further edits keep previous ones in mind
-    int retskin = setskinbyname("New Santa", "santa_coala", &d);
-    setskinbyid(9, "bomb", &d);
-
-    int retmap = changemap(mp, "pepeg", &d);
-
-    printf("id: %d name: %d\n", retid, retname);
-    printf("skin: %d, map: %d\n", retskin, retmap);
-
-    writedemo(op, &d);
-
-    printdemo(&d, 0);
-
-    freedemo(&d);
-
-    fclose(fp);
-    fclose(op);
-    fclose(mp);
 
     exit(EXIT_SUCCESS);
 
