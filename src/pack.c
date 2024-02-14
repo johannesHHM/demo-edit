@@ -50,29 +50,6 @@ int readint(char **cp)
     return result;
 }
 
-/*
-int readint(char **src)
-{
-    const int sign = (**src >> 6) & 1;
-
-    int out = **src & 0x3f;
-
-    const static int masks[] = {0x7F, 0x7F, 0x7F, 0x0F};
-    const static int shifts[] = {6, 6 + 7, 6 + 7 + 7, 6 + 7 + 7 + 7};
-
-    for (unsigned int i = 0; i < sizeof(masks); i++)
-    {
-        if (!(**src & 0x80))
-            break;
-        (*src)++;
-        out |= (**src & masks[i]) << shifts[i];
-    }
-    (*src)++;
-    out ^= -sign;
-    return out;
-}
-*/
-
 /* function is lifted from */
 /* https://github.com/heinrich5991/libtw2/blob/b9286674da94d3d45b9c10ffce517af394e2d58c/packer/src/lib.rs#L105 */
 void writeint(int i, char **cp)
@@ -107,6 +84,8 @@ void writeint(int i, char **cp)
     }
 }
 
+/* function is copied from */
+/* https://github.com/teeworlds/teeworlds/blob/a1911c8f7d8458fb4076ef8e7651e8ef5e91ab3e/src/game/gamecore.h#L68 */
 void intstostr(const int *ints, int num, char *str)
 {
     while (num)
