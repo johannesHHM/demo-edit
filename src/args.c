@@ -1,129 +1,275 @@
 #include "../inc/args.h"
-#include "../inc/commands.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-void parsecmdstr(cmdinput *cmd, char *cmdstr)
+typedef struct parg
 {
-    switch (cmd->settype)
-    {
-    case 'i':
-        if (sscanf(cmdstr, "%i:%23[^\n]", &cmd->id, cmd->to) != 2)
-        {
-            fprintf(stderr, "ERROR: Failed to parse argument '%s' to type 'ID:RESULT'\n", cmdstr);
-            exit(EXIT_FAILURE);
-        }
-        break;
-    case 'n':
-        if (sscanf(cmdstr, "%23[^:]:%23[^\n]", cmd->from, cmd->to) != 2)
-        {
-            fprintf(stderr, "ERROR: Failed to parse argument '%s' to type 'NAME:RESULT'\n", cmdstr);
-            exit(EXIT_FAILURE);
-        }
-        break;
-    case '\0':
-        fprintf(stderr, "ERROR: Found no flag modifier\n");
-        exit(EXIT_FAILURE);
-        break;
-    default:
-        fprintf(stderr, "ERROR: Failed to parse flag with '%c' modifier\n", cmd->settype);
-        exit(EXIT_FAILURE);
-        break;
-    }
+    argtype type;
+    char *flag;
+    char *full;
+    int numopt;
+    char *desc[2];
+    void (*runarg)(struct arg *);
+} parg;
+
+int argerr = 0;
+char *errflag = NULL;
+
+char *inf = NULL;
+char *usg = NULL;
+
+int PARGC = 0;
+int pargscap = 2;
+parg *PARGS = NULL;
+
+int ARGC = 0;
+int argscap = 2;
+arg *ARGS;
+
+void setinfo(char *info)
+{
+    inf = info;
 }
 
-void parseargs(input *in, int argc, char *argv[])
+void setusage(char *usage)
 {
-    in->demopath = NULL;
-    in->mappath = NULL;
-    in->outpath = NULL;
-    in->print = 0;
-    in->extractmap = 0;
+    usg = usage;
+}
 
-    in->numcmds = 0;
-
-    int argi;
-    for (argi = 1; argi < argc; argi++)
+int addparg(argtype type, char *flag, char *full, int numopt, char *desc1, char *desc2, void (*runarg)(struct arg *))
+{
+    if (!PARGS)
+        PARGS = (parg *)malloc(pargscap * sizeof(parg));
+    else
     {
-        if (argv[argi][0] == '-')
+        pargscap *= 2;
+        PARGS = (parg *)realloc(PARGS, pargscap * sizeof(parg));
+    }
+    PARGS[PARGC].type = type;
+    PARGS[PARGC].flag = flag;
+    PARGS[PARGC].full = full;
+    PARGS[PARGC].numopt = numopt;
+    PARGS[PARGC].desc[0] = desc1;
+    PARGS[PARGC].desc[1] = desc2;
+    PARGS[PARGC].runarg = runarg;
+    PARGC++;
+
+    return 1;
+}
+
+int addarg(char *value, char *desc, void (*runarg)(struct arg *))
+{
+    if (!value || !desc)
+        return 0;
+    addparg(ARGUMENT, NULL, NULL, 0, value, desc, runarg);
+    return 1;
+}
+
+int addopt(char *flag, char *full, int numopt, char *value, char *desc, void (*runarg)(struct arg *))
+{
+    if (!flag || !desc)
+        return 0;
+    addparg(OPTION, flag, full, numopt, value, desc, runarg);
+    return 1;
+}
+
+int checkarg(char *str, parg *par)
+{
+    if (par->flag && strcmp(str, par->flag) == 0)
+        return 1;
+
+    if (par->full && strcmp(str, par->full) == 0)
+        return 1;
+
+    return 0;
+}
+
+int parseargs(int argc, char *args[])
+{
+    ARGS = (arg *)malloc(argscap * sizeof(arg));
+
+    char inctype[] = {0, 0, 0};
+    for (int i = 0; i < PARGC; i++)
+        inctype[PARGS[i].type]++;
+
+    int argumentc = 0;
+
+    for (int i = 1; i < argc; i++)
+    {
+        char *a = args[i];
+        char isopt = 0;
+        for (int y = 0; y < PARGC; y++)
         {
-            cmdinput *cmd = &in->commands[in->numcmds];
-            switch (argv[argi][1])
+            parg *pa = &PARGS[y];
+            if (checkarg(a, pa))
             {
-            case 'n':
-                if (argi + 1 >= argc)
+                if (i + pa->numopt >= argc)
                 {
-                    fprintf(stderr, "ERROR: Flag 'n' requires additional argument\n");
-                    exit(EXIT_FAILURE);
+                    argerr = 1;
+                    errflag = pa->flag;
+                    return 0;
                 }
-                cmd->cmdtype = argv[argi][1];
-                cmd->settype = argv[argi][2];
-                parsecmdstr(cmd, argv[argi + 1]);
-                in->numcmds++;
-                argi++;
-                break;
-            case 's':
-                if (argi + 1 >= argc)
+                isopt = 1;
+                if (argscap >= ARGC)
                 {
-                    fprintf(stderr, "ERROR: Flag 's' requires additional argument\n");
-                    exit(EXIT_FAILURE);
+                    argscap *= 2;
+                    ARGS = (arg *)realloc(ARGS, argscap * sizeof(arg));
                 }
-                cmd->cmdtype = argv[argi][1];
-                cmd->settype = argv[argi][2];
-                parsecmdstr(cmd, argv[argi + 1]);
-                in->numcmds++;
-                argi++;
-                break;
-            case 'o':
-                if (argi + 1 >= argc)
+                ARGS[ARGC].type = pa->type;
+                ARGS[ARGC].flag = a;
+                ARGS[ARGC].numopt = pa->numopt;
+                ARGS[ARGC].runarg = pa->runarg;
+                ARGS[ARGC].opts = (char **)malloc(pa->numopt * sizeof(char *));
+
+                for (int j = 0; j < pa->numopt; j++)
+                    ARGS[ARGC].opts[j] = args[i + j + 1];
+
+                i += pa->numopt;
+                ARGC++;
+            }
+        }
+        if (isopt)
+            continue;
+
+        if (argumentc < inctype[ARGUMENT])
+        {
+            ARGS[ARGC].type = ARGUMENT;
+            for (int y = 0, x = argumentc; y < PARGC; y++)
+            {
+                if (PARGS[y].type == ARGUMENT)
                 {
-                    fprintf(stderr, "ERROR: Flag 'o' requires additional argument\n");
-                    exit(EXIT_FAILURE);
+                    if (x != 0)
+                        x--;
+                    else
+                    {
+                        ARGS[ARGC].numopt = 1;
+                        ARGS[ARGC].flag = "NONE";
+                        ARGS[ARGC].runarg = PARGS[y].runarg;
+                        ARGS[ARGC].opts = (char **)malloc(sizeof(char *));
+                        ARGS[ARGC].opts[0] = a;
+                        argumentc++;
+                        ARGC++;
+                    }
                 }
-                in->outpath = argv[argi + 1];
-                argi++;
-                break;
-            case 'p':
-                in->print = 1;
-                break;
-            case 'e':
-                if (argi + 1 >= argc)
-                {
-                    fprintf(stderr, "ERROR: Flag 'e' requires additional argument\n");
-                    exit(EXIT_FAILURE);
-                }
-                in->extractmap = argv[argi + 1];
-                argi++;
-                break;
-            case 'm':
-                if (argi + 1 >= argc)
-                {
-                    fprintf(stderr, "ERROR: Flag 'm' requires additional argument\n");
-                    exit(EXIT_FAILURE);
-                }
-                in->mappath = argv[argi + 1];
-                argi++;
-                break;
-            default:
-                fprintf(stderr, "ERROR: Unknown flag '%c'\n", argv[argi][1]);
-                exit(EXIT_FAILURE);
-                break;
             }
         }
         else
         {
-            if (in->demopath)
-            {
-                fprintf(stderr, "ERROR: Found two non-flag arguments\n");
-                exit(EXIT_FAILURE);
-            }
-            in->demopath = argv[argi];
+            argerr = 2;
+            errflag = NULL;
+            return 0;
         }
     }
-    if (!in->demopath)
+    return 1;
+}
+
+void runargs()
+{
+    for (int i = 0; i < ARGC; i++)
     {
-        fprintf(stderr, "ERROR: Found no demo input\n");
-        exit(EXIT_FAILURE);
+        if (ARGS[i].runarg)
+            ARGS[i].runarg(&ARGS[i]);
     }
+}
+
+arg *getarg(int pos)
+{
+    for (int i = 0; i < ARGC; i++)
+        if (ARGS[i].type == ARGUMENT)
+        {
+            if (pos == 0)
+                return &ARGS[i];
+            pos--;
+        }
+    return NULL;
+}
+
+arg *getopt(char *flag, int pos)
+{
+    for (int i = 0; i < ARGC; i++)
+        if (ARGS[i].type == OPTION && strcmp(flag, ARGS[i].flag) == 0)
+        {
+            if (pos == 0)
+                return &ARGS[i];
+            pos--;
+        }
+    return NULL;
+}
+void printhelp()
+{
+    char inctype[ARGTYPELEN] = {0, 0, 0};
+    int maxflag[ARGTYPELEN] = {0, 0, 0};
+    int maxfull[ARGTYPELEN] = {0, 0, 0};
+    int maxdesc0[ARGTYPELEN] = {0, 0, 0};
+    int maxdesc1[ARGTYPELEN] = {0, 0, 0};
+
+    for (int i = 0; i < PARGC; i++)
+    {
+        parg *pa = &PARGS[i];
+        int type = pa->type;
+
+        inctype[type]++;
+        if (pa->flag)
+            maxflag[type] = (maxflag[type] > strlen(pa->flag) ? maxflag[type] : strlen(pa->flag));
+        if (pa->full)
+            maxfull[type] = (maxfull[type] > strlen(pa->full) ? maxfull[type] : strlen(pa->full));
+        if (pa->desc[0])
+            maxdesc0[type] = (maxdesc0[type] > strlen(pa->desc[0]) ? maxdesc0[type] : strlen(pa->desc[0]));
+        if (pa->desc[1])
+            maxdesc1[type] = (maxdesc1[type] > strlen(pa->desc[1]) ? maxdesc1[type] : strlen(pa->desc[1]));
+    }
+    if (inf)
+        printf("%s\n\n", inf);
+
+    if (usg)
+        printf("\e[4mUsage:\e[0m %s\n", usg);
+
+    if (inctype[ARGUMENT])
+    {
+        printf("\n\e[4mArgument%c:\e[0m\n", (inctype[ARGUMENT] < 2) ? '\0' : 's');
+        for (int i = 0; i < PARGC; i++)
+        {
+            parg *pa = &PARGS[i];
+            if (pa->type == ARGUMENT)
+                printf("  %s %s\n", pa->desc[0], pa->desc[1]);
+        }
+    }
+
+    if (inctype[OPTION])
+    {
+        printf("\n\e[4mOption%c:\e[0m\n", (inctype[OPTION] < 2) ? '\0' : 's');
+        for (int i = 0; i < PARGC; i++)
+        {
+            parg *pa = &PARGS[i];
+            if (pa->type == OPTION)
+                printf("  %*s, %-*s %-*s  %s\n", maxflag[OPTION], pa->flag, maxfull[OPTION], pa->full, maxdesc0[OPTION],
+                       (pa->desc[0]) ? pa->desc[0] : "", pa->desc[1]);
+        }
+    }
+}
+
+void paerror(char *str)
+{
+    char *errstr;
+    switch (argerr)
+    {
+    case 0:
+        errstr = "No error";
+        break;
+    case 1:
+        errstr = "Missing input for option flag";
+        break;
+    case 2:
+        errstr = "Too many positional arguments";
+        break;
+    default:
+        errstr = "Unknown error";
+        break;
+    }
+    if (errflag)
+        fprintf(stderr, "%s %s '%s'\n", str, errstr, errflag);
+    else
+        fprintf(stderr, "%s %s\n", str, errstr);
 }

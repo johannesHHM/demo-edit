@@ -6,8 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <unistd.h>
-
 int testcompress(char *line)
 {
     char inputbuff[4096];
@@ -142,111 +140,116 @@ int mapname(char *mappath, char *out)
     return 1;
 }
 
-void run(input *in)
+FILE *demofile = NULL, *outfile = NULL, *mapfile = NULL, *exmapfile = NULL;
+demo DEMO;
+
+void exitperror(char *str)
 {
-    if (!in->demopath)
-        exit(EXIT_FAILURE);
-
-    FILE *demofile, *outfile, *mapfile, *exmapfile;
-    demofile = NULL;
-    outfile = NULL;
-    mapfile = NULL;
-    exmapfile = NULL;
-
-    demofile = fopen(in->demopath, "r");
-    if (!demofile)
-    {
-        perror("ERROR: Failed to open demo file, reason");
-        exit(EXIT_FAILURE);
-    }
-
-    if (in->outpath)
-    {
-        outfile = fopen(in->outpath, "w");
-        if (!outfile)
-        {
-            perror("ERROR: Failed to open output file, reason");
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    if (in->mappath)
-    {
-        mapfile = fopen(in->mappath, "r");
-        if (!mapfile)
-        {
-            perror("ERROR: Failed to open map file, reason");
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    if (in->extractmap)
-    {
-        exmapfile = fopen(in->extractmap, "r");
-        if (!exmapfile)
-        {
-            perror("ERROR: Failed to open extract map file, reason");
-            exit(EXIT_FAILURE);
-        }
-        // TODO extract map here
-    }
-
-    demo dmo;
-
-    if (readdemo(demofile, &dmo) < 0)
-    {
-        fprintf(stderr, "ERROR: Failed to parse demo\n");
-        exit(EXIT_FAILURE);
-    }
-
-    if (in->print)
-        printdemo(&dmo, 0);
-
-    if (mapfile)
-    {
-        char mname[32];
-        if (mapname(in->mappath, mname))
-        {
-            if (changemap(mapfile, mname, &dmo) < 0)
-            {
-                fprintf(stderr, "ERROR: Failed to set map '%s'\n", in->mappath);
-                exit(EXIT_FAILURE);
-            }
-        }
-        else
-        {
-            fprintf(stderr, "ERROR: Given map has too long name (must be < 32)\n");
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    for (int i = 0; i < in->numcmds; i++)
-    {
-        runcommand(&in->commands[i], &dmo);
-    }
-
-    if (outfile)
-    {
-        if (writedemo(outfile, &dmo) < 0)
-        {
-            fprintf(stderr, "ERROR: Failed to write demo to '%s'\n", in->outpath);
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    if (demofile)
-        freedemo(&dmo);
-
+    perror(str);
+    exit(EXIT_FAILURE);
 }
 
-void printhelp()
+void setdemo(arg *argument)
 {
-    printf("HELP! I hope this helped you.\n");
+    demofile = fopen(argument->opts[0], "r");
+    if (!demofile)
+        exitperror("Error: failed to open demofile, reason");
+    if (readdemo(demofile, &DEMO) < 0)
+    {
+        fprintf(stderr, "Error: failed to parse demo\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void setmap(arg *argument)
+{
+    mapfile = fopen(argument->opts[0], "r");
+    if (!mapfile)
+        exitperror("Error: failed to open mapfile, reason");
+
+    char mapnamebuff[32];
+    if (mapname(argument->opts[0], mapnamebuff))
+    {
+        if (changemap(mapfile, mapnamebuff, &DEMO) < 1)
+        {
+            fprintf(stderr, "Error: failed to set map '%s'\n", argument->opts[0]);
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        fprintf(stderr, "Error: map name is too long (> 32)\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void runrename(arg *renamearg)
+{
+    int intid;
+    int ret;
+    if (sscanf(renamearg->opts[0], "%d", &intid) == 1)
+        ret = setnamebyid(intid, renamearg->opts[1], &DEMO);
+    else
+        ret = setnamebyname(renamearg->opts[0], renamearg->opts[1], &DEMO);
+
+    if (ret < 0)
+    {
+        printf("Error: failed to rename player '%s', reason: name too long\n", renamearg->opts[0]);
+        exit(EXIT_FAILURE);
+    }
+}
+
+void runsetskin(arg *skinarg)
+{
+    int intid;
+    int ret;
+    if (sscanf(skinarg->opts[0], "%d", &intid) == 1)
+        ret = setskinbyid(intid, skinarg->opts[1], &DEMO);
+    else
+        ret = setskinbyname(skinarg->opts[0], skinarg->opts[1], &DEMO);
+
+    if (ret < 0)
+    {
+        printf("Error: failed to set skin of player '%s', reason: skin name too long\n", skinarg->opts[0]);
+        exit(EXIT_FAILURE);
+    }
+}
+
+void runoutput(arg *outarg)
+{
+    outfile = fopen(outarg->opts[0], "w");
+    if (!outfile)
+        exitperror("Error: failed to write to outputfile, reason");
+    if (writedemo(outfile, &DEMO) < 0)
+    {
+        fprintf(stderr, "Error: failed to write demo file to outputfile\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 int main(int argc, char *argv[])
 {
     inithuff(NULL);
+
+    setinfo("d(emo)edit, a tool for manipulating teeworlds demos");
+    setusage("dedit <demo> [OPTIONS]");
+
+    addarg("<demo>", "Sets input demo", setdemo);
+
+    addopt("-r", "--rename", 2, "<id> <name>", "Renames player with id to name", NULL);
+    addopt("-s", "--skin", 2, "<id> <name>", "Set skin of player with id to skin", NULL);
+    addopt("-m", "--map", 1, "<map>", "Changes the map of demo to map", setmap);
+    addopt("-e", "--extract-map", 1, "<file>", "Saves the map of demo to file", NULL);
+    addopt("-o", "--output", 1, "<file>", "Saves the output demo to file", NULL);
+    addopt("-i", "--info", 0, NULL, "Prints info of demo", NULL);
+    addopt("-I", "--extended-info", 0, NULL, "Prints extended info of demo", NULL);
+    addopt("-h", "--help", 0, NULL, "Prints this help info", NULL);
+
+    if (!parseargs(argc, argv))
+    {
+        paerror("Error:");
+        printf("For more help run 'dedit --help'\n");
+    }
 
     if (argc == 1)
     {
@@ -254,29 +257,58 @@ int main(int argc, char *argv[])
         exit(EXIT_SUCCESS);
     }
 
-    input in;
+    if (getopt("-h", 0))
+        printhelp();
 
-    parseargs(&in, argc, argv);
-
-    /*
-    printf("demopath: %s\n", in.demopath);
-    printf("outpath: %s\n", in.outpath);
-    printf("mappath: %s\n", in.mappath);
-    printf("extractpath: %s\n", in.extractmap);
-    printf("print: %d\n", in.print);
-
-    printf("\ncommands:\n");
-    for (int i = 0; i < in.numcmds; i++)
+    arg *demoarg = getarg(0);
+    if (demoarg == NULL)
     {
-        cmdinput *c = &in.commands[i];
-        printf("command: {cmd: %c, type: %c, id: %d, from: %s, to: %s}\n", c->cmdtype, c->settype, c->id, c->from,
-    c->to);
+        printf("Error: Missing required argument <demo>\n");
+        exit(EXIT_FAILURE);
     }
 
-    printf("\nEXITING SUCCESS\n");
-    */
+    demoarg->runarg(demoarg);
 
-    run(&in);
+    arg *outarg = getopt("-o", 0);
+    arg *maparg = getopt("-m", 0);
+    arg *exmarg = getopt("-e", 0);
+    arg *infarg = getopt("-i", 0);
+    arg *Infarg = getopt("-I", 0);
+
+    if (maparg)
+        setmap(maparg);
+
+    if (Infarg)
+        printdemo(&DEMO, 1);
+    else if (infarg)
+        printdemo(&DEMO, 0);
+
+    if (exmarg)
+        printf("Info: not implemented extract map\n");
+
+    int i = 0;
+    arg *opt;
+    while (1)
+    {
+        opt = getopt("-s", i);
+        if (opt == NULL)
+            break;
+        runsetskin(opt);
+        i++;
+    }
+
+    i = 0;
+    while (1)
+    {
+        opt = getopt("-r", i);
+        if (opt == NULL)
+            break;
+        runrename(opt);
+        i++;
+    }
+
+    if (outarg)
+        runoutput(outarg);
 
     exit(EXIT_SUCCESS);
 
