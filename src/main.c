@@ -6,109 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int testcompress(char *line)
-{
-    char inputbuff[4096];
-    char outputbuff[4096];
-    char resultbuff[4096];
-
-    int inputlen = 0;
-    int resultlen = 0;
-    char *splitpos = line;
-
-    while (*splitpos != '#')
-        splitpos++;
-
-    while (sscanf(line, "%2hhx", inputbuff + inputlen) == 1 && line < splitpos)
-    {
-        inputlen++;
-        line += 3;
-    }
-
-    splitpos++;
-    while (sscanf(splitpos, "%2hhx", resultbuff + resultlen) == 1)
-    {
-        resultlen++;
-        splitpos += 3;
-    }
-    int i;
-
-    int outputlen = compresshuff(inputbuff, inputlen, outputbuff, 4096);
-    if (outputlen < 0)
-    {
-        printf("[FAILED TEST] Failed compress test! outputbuff too small\n");
-        return -1;
-    }
-
-    if (outputlen != resultlen)
-    {
-        printf("[FAILED TEST] Failed compress test! different result output length\n");
-        return -1;
-    }
-
-    for (i = 0; i < outputlen; i++)
-    {
-        if (resultbuff[i] != outputbuff[i])
-        {
-            printf("[FAILED TEST] Failed compress test!\n");
-            return -1;
-        }
-    }
-    return 1;
-}
-
-int testdecompress(char *line)
-{
-    char inputbuff[4096];
-    char outputbuff[4096];
-    char resultbuff[4096];
-
-    int inputlen = 0;
-    int resultlen = 0;
-    char *splitpos = line;
-
-    while (*splitpos != '#')
-        splitpos++;
-
-    while (sscanf(line, "%2hhx", inputbuff + inputlen) == 1 && line < splitpos)
-    {
-        inputlen++;
-        line += 3;
-    }
-
-    splitpos++;
-    while (sscanf(splitpos, "%2hhx", resultbuff + resultlen) == 1)
-    {
-        resultlen++;
-        splitpos += 3;
-    }
-    int i;
-
-    int outputlen = decompresshuff(resultbuff, inputlen, outputbuff, 4096);
-    if (outputlen < 0)
-    {
-        printf("[FAILED TEST] Failed decompress test! Error when decompressing\n");
-        return -1;
-    }
-
-    if (outputlen != inputlen)
-    {
-        printf("[FAILED TEST] Failed decompress test! different result output length\n");
-        printf("[ PROGNOSIS ] inputlen: %d  outputlen: %d\n", inputlen, outputlen);
-        return -1;
-    }
-
-    for (i = 0; i < outputlen; i++)
-    {
-        if (inputbuff[i] != outputbuff[i])
-        {
-            printf("[FAILED TEST] Failed decompress test! non matching buffers\n");
-            return -1;
-        }
-    }
-    return 1;
-}
-
 int mapname(char *mappath, char *out)
 {
     int start = 0;
@@ -159,6 +56,7 @@ void setdemo(arg *argument)
         fprintf(stderr, "Error: failed to parse demo\n");
         exit(EXIT_FAILURE);
     }
+    fclose(demofile);
 }
 
 void setmap(arg *argument)
@@ -181,6 +79,7 @@ void setmap(arg *argument)
         fprintf(stderr, "Error: map name is too long (> 32)\n");
         exit(EXIT_FAILURE);
     }
+    fclose(mapfile);
 }
 
 void runrename(arg *renamearg)
@@ -225,6 +124,7 @@ void runoutput(arg *outarg)
         fprintf(stderr, "Error: failed to write demo file to outputfile\n");
         exit(EXIT_FAILURE);
     }
+    fclose(outfile);
 }
 
 int main(int argc, char *argv[])
@@ -236,8 +136,8 @@ int main(int argc, char *argv[])
 
     addarg("<demo>", "Sets input demo", setdemo);
 
-    addopt("-r", "--rename", 2, "<id> <name>", "Renames player with id to name", NULL);
-    addopt("-s", "--skin", 2, "<id> <name>", "Set skin of player with id to skin", NULL);
+    addopt("-r", "--rename", 2, "<id/name> <name>", "Renames player with id/name to name", NULL);
+    addopt("-s", "--skin", 2, "<id/name> <name>", "Set skin of player with id/name to skin", NULL);
     addopt("-m", "--map", 1, "<map>", "Changes the map of demo to map", setmap);
     addopt("-e", "--extract-map", 1, "<file>", "Saves the map of demo to file", NULL);
     addopt("-o", "--output", 1, "<file>", "Saves the output demo to file", NULL);
@@ -311,27 +211,4 @@ int main(int argc, char *argv[])
         runoutput(outarg);
 
     exit(EXIT_SUCCESS);
-
-    // Testing
-    /*
-    inithuff(NULL);
-
-    FILE *fp = fopen("data/huff_test_cases", "r");
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t nread;
-
-    while ((nread = getline(&line, &len, fp)) != -1)
-    {
-        if (testcompress(line) < 0)
-            exit(EXIT_FAILURE);
-        if (testdecompress(line) < 0)
-            exit(EXIT_FAILURE);
-    }
-
-    fclose(fp);
-    free(line);
-
-    exit(EXIT_SUCCESS);
-    */
 }

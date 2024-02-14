@@ -212,13 +212,13 @@ void printhelp()
 
         inctype[type]++;
         if (pa->flag)
-            maxflag[type] = (maxflag[type] > strlen(pa->flag) ? maxflag[type] : strlen(pa->flag));
+            maxflag[type] = ((size_t)maxflag[type] > strlen(pa->flag) ? maxflag[type] : (int)strlen(pa->flag));
         if (pa->full)
-            maxfull[type] = (maxfull[type] > strlen(pa->full) ? maxfull[type] : strlen(pa->full));
+            maxfull[type] = ((size_t)maxfull[type] > strlen(pa->full) ? maxfull[type] : (int)strlen(pa->full));
         if (pa->desc[0])
-            maxdesc0[type] = (maxdesc0[type] > strlen(pa->desc[0]) ? maxdesc0[type] : strlen(pa->desc[0]));
+            maxdesc0[type] = ((size_t)maxdesc0[type] > strlen(pa->desc[0]) ? maxdesc0[type] : (int)strlen(pa->desc[0]));
         if (pa->desc[1])
-            maxdesc1[type] = (maxdesc1[type] > strlen(pa->desc[1]) ? maxdesc1[type] : strlen(pa->desc[1]));
+            maxdesc1[type] = ((size_t)maxdesc1[type] > strlen(pa->desc[1]) ? maxdesc1[type] : (int)strlen(pa->desc[1]));
     }
     if (inf)
         printf("%s\n\n", inf);

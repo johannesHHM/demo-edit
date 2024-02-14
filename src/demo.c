@@ -115,7 +115,7 @@ int readdemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
     }
 
     dm->data = (char *)malloc(mapsize);
-    if (fread(dm->data, 1, mapsize, fp) != mapsize)
+    if (fread(dm->data, 1, mapsize, fp) != (size_t)mapsize)
         return -3;
 
     return 1;
@@ -206,7 +206,7 @@ int readdemosnap(FILE *fp, demosnap *snap, int size)
 int readdemomessage(FILE *fp, demomessage *message, int size)
 {
     unsigned char data[size];
-    if (fread(data, 1, size, fp) != size)
+    if (fread(data, 1, size, fp) != (size_t)size)
         return -1;
 
     message->data = (char *)malloc(size);
@@ -219,7 +219,7 @@ int readdemomessage(FILE *fp, demomessage *message, int size)
 int readdemodelta(FILE *fp, demodelta *delta, int size)
 {
     unsigned char data[size];
-    if (fread(data, 1, size, fp) != size)
+    if (fread(data, 1, size, fp) != (size_t)size)
         return -1;
 
     delta->data = (char *)malloc(size);
@@ -394,7 +394,7 @@ int writedemomap(FILE *fp, demomap *dm, int mapsize, unsigned char ver)
             return -1;
     }
 
-    if (fwrite(dm->data, 1, mapsize, fp) != mapsize)
+    if (fwrite(dm->data, 1, mapsize, fp) != (size_t)mapsize)
         return -2;
 
     return 1;
