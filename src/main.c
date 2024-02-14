@@ -151,14 +151,11 @@ int main(int argc, char *argv[])
         printf("For more help run 'dedit --help'\n");
     }
 
-    if (argc == 1)
+    if (argc == 1 || getopt("-h", 0))
     {
         printhelp();
         exit(EXIT_SUCCESS);
     }
-
-    if (getopt("-h", 0))
-        printhelp();
 
     arg *demoarg = getarg(0);
     if (demoarg == NULL)

@@ -118,7 +118,7 @@ int parseargs(int argc, char *args[])
                     ARGS = (arg *)realloc(ARGS, argscap * sizeof(arg));
                 }
                 ARGS[ARGC].type = pa->type;
-                ARGS[ARGC].flag = a;
+                ARGS[ARGC].flag = pa->flag;
                 ARGS[ARGC].numopt = pa->numopt;
                 ARGS[ARGC].runarg = pa->runarg;
                 ARGS[ARGC].opts = (char **)malloc(pa->numopt * sizeof(char *));
