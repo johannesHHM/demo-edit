@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     addarg("<demo>", "Sets input demo", setdemo);
 
     addopt("-r", "--rename", 2, "<id/name> <name>", "Renames player with id/name to name", NULL);
-    addopt("-s", "--skin", 2, "<id/name> <name>", "Set skin of player with id/name to skin", NULL);
+    addopt("-s", "--skin", 2, "<id/name> <skin>", "Set skin of player with id/name to skin", NULL);
     addopt("-m", "--map", 1, "<map>", "Changes the map of demo to map", setmap);
     addopt("-e", "--extract-map", 1, "<file>", "Saves the map of demo to file", NULL);
     addopt("-o", "--output", 1, "<file>", "Saves the output demo to file", NULL);
