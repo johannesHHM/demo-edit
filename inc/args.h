@@ -30,6 +30,7 @@ int addarg(char *value, char *desc, void (*runarg)(struct arg *));
 int addopt(char *flag, char *full, int numopt, char *value, char *desc, void (*runarg)(struct arg *));
 
 int parseargs(int argc, char *args[]);
+void freeargs();
 void runargs();
 
 arg *getarg(int pos);

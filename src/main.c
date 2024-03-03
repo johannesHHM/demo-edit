@@ -50,7 +50,10 @@ void setdemo(arg *argument)
 {
     demofile = fopen(argument->opts[0], "r");
     if (!demofile)
-        exitperror("Error: failed to open demofile, reason");
+    {
+        fprintf(stderr, "Error: failed to open demofile '%s', ", argument->opts[0]);
+        exitperror("reason");
+    }
     if (readdemo(demofile, &DEMO) < 0)
     {
         fprintf(stderr, "Error: failed to parse demo\n");
@@ -206,6 +209,8 @@ int main(int argc, char *argv[])
 
     if (outarg)
         runoutput(outarg);
+
+    freeargs();
 
     exit(EXIT_SUCCESS);
 }

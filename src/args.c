@@ -157,12 +157,33 @@ int parseargs(int argc, char *args[])
         }
         else
         {
-            argerr = 2;
-            errflag = NULL;
+            if (a[0] != '-')
+            {
+                argerr = 2;
+                errflag = NULL;
+            }
+            else
+            {
+                argerr = 3;
+                errflag = args[i];
+            }
             return 0;
         }
     }
     return 1;
+}
+
+void freeargs()
+{
+    for (int i = 0; i < ARGC; i++)
+    {
+        if (ARGS[i].opts)
+            free(ARGS[i].opts);
+    }
+    if (ARGS)
+        free(ARGS);
+    if (PARGS)
+        free(PARGS);
 }
 
 void runargs()
@@ -197,6 +218,7 @@ arg *getopt(char *flag, int pos)
         }
     return NULL;
 }
+
 void printhelp()
 {
     char inctype[ARGTYPELEN] = {0, 0, 0};
@@ -263,6 +285,9 @@ void paerror(char *str)
         break;
     case 2:
         errstr = "Too many positional arguments";
+        break;
+    case 3:
+        errstr = "Unknown flag";
         break;
     default:
         errstr = "Unknown error";
