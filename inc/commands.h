@@ -23,6 +23,9 @@ int setskinbyname(char *name, char *skin, demo *demo);
 /* Will fail if mapname >= 31, or map is not a teeworlds datafile */
 int changemap(FILE *map, char *mapname, demo *demo);
 
+/* Writes the map in demo to out */
+int exportmap(FILE *out, demo *demo);
+
 void runcommand(cmdinput *cmd, demo *demo);
 
 #endif // COMMANDS_H

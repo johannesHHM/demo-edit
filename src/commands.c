@@ -171,6 +171,14 @@ int changemap(FILE *map, char *mapname, demo *demo)
     return 1;
 }
 
+int exportmap(FILE *out, demo *demo)
+{
+    if (fwrite(demo->map.data, 1, demo->header.mapsize, out) < (unsigned int) demo->header.mapsize)
+        return -1;
+
+    return 1;
+}
+
 void runcommand(cmdinput *cmd, demo *demo)
 {
     switch (cmd->cmdtype)

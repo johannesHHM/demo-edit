@@ -6,7 +6,7 @@ EXE := $(BIN_DIR)/dedit
 SRC := $(wildcard $(SRC_DIR)/*.c)
 OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-CFLAGS   := -Wall -Wextra
+CFLAGS := -Wall -Wextra
 
 .PHONY: all clean run format
 

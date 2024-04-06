@@ -37,7 +37,7 @@ int mapname(char *mappath, char *out)
     return 1;
 }
 
-FILE *demofile = NULL, *outfile = NULL, *mapfile = NULL, *exmapfile = NULL;
+FILE *demofile = NULL, *outfile = NULL, *mapfile = NULL, *extmapfile = NULL;
 demo DEMO;
 
 void exitperror(char *str)
@@ -117,11 +117,26 @@ void runsetskin(arg *skinarg)
     }
 }
 
+void runextractmap(arg *extarg)
+{
+    extmapfile = fopen(extarg->opts[0], "w");
+    if (!extmapfile)
+        exitperror("Error: failed to write to extract map file, reason");
+
+    if (exportmap(extmapfile, &DEMO) < 0)
+    {
+        fprintf(stderr, "Error: failed to write demo map to extract map file\n");
+        exit(EXIT_FAILURE);
+    }
+    fclose(extmapfile);
+}
+
 void runoutput(arg *outarg)
 {
     outfile = fopen(outarg->opts[0], "w");
     if (!outfile)
         exitperror("Error: failed to write to outputfile, reason");
+
     if (writedemo(outfile, &DEMO) < 0)
     {
         fprintf(stderr, "Error: failed to write demo file to outputfile\n");
@@ -139,8 +154,8 @@ int main(int argc, char *argv[])
 
     addarg("<demo>", "Sets input demo", setdemo);
 
-    addopt("-r", "--rename", 2, "<id/name> <name>", "Renames player with id/name to name", NULL);
-    addopt("-s", "--skin", 2, "<id/name> <skin>", "Set skin of player with id/name to skin", NULL);
+    addopt("-r", "--rename", 2, "<id/name> <name>", "Renames player with id/name to name", runrename);
+    addopt("-s", "--skin", 2, "<id/name> <skin>", "Set skin of player with id/name to skin", runsetskin);
     addopt("-m", "--map", 1, "<map>", "Changes the map of demo to map", setmap);
     addopt("-e", "--extract-map", 1, "<file>", "Saves the map of demo to file", NULL);
     addopt("-o", "--output", 1, "<file>", "Saves the output demo to file", NULL);
@@ -175,6 +190,9 @@ int main(int argc, char *argv[])
     arg *infarg = getopt("-i", 0);
     arg *Infarg = getopt("-I", 0);
 
+    if (exmarg)
+        runextractmap(exmarg);
+
     if (maparg)
         setmap(maparg);
 
@@ -183,9 +201,6 @@ int main(int argc, char *argv[])
     else if (infarg)
         printdemo(&DEMO, 0);
 
-    if (exmarg)
-        printf("Info: not implemented extract map\n");
-
     int i = 0;
     arg *opt;
     while (1)
@@ -193,7 +208,7 @@ int main(int argc, char *argv[])
         opt = getopt("-s", i);
         if (opt == NULL)
             break;
-        runsetskin(opt);
+        opt->runarg(opt);
         i++;
     }
 
@@ -203,7 +218,7 @@ int main(int argc, char *argv[])
         opt = getopt("-r", i);
         if (opt == NULL)
             break;
-        runrename(opt);
+        opt->runarg(opt);
         i++;
     }
 
