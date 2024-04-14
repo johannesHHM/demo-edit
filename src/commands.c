@@ -173,48 +173,9 @@ int changemap(FILE *map, char *mapname, demo *demo)
 
 int exportmap(FILE *out, demo *demo)
 {
-    if (fwrite(demo->map.data, 1, demo->header.mapsize, out) < (unsigned int) demo->header.mapsize)
+    if (fwrite(demo->map.data, 1, demo->header.mapsize, out) < (unsigned int)demo->header.mapsize)
         return -1;
 
     return 1;
 }
 
-void runcommand(cmdinput *cmd, demo *demo)
-{
-    switch (cmd->cmdtype)
-    {
-    case 'n':
-        switch (cmd->settype)
-        {
-        case 'i':
-            if (setnamebyid(cmd->id, cmd->to, demo) < 0)
-                printf("WARNING: Could not set name '%s' because it exeeds max limit of 15 characters\n", cmd->to);
-            break;
-        case 'n':
-            if (setnamebyname(cmd->from, cmd->to, demo) < 0)
-                printf("WARNING: Could not set name '%s' because it exeeds max limit of 15 characters\n", cmd->to);
-            break;
-        default:
-            printf("WARNING: Unknown modifier for name\n");
-        }
-        break;
-    case 's':
-        switch (cmd->settype)
-        {
-        case 'i':
-            if (setskinbyid(cmd->id, cmd->to, demo) < 0)
-                printf("WARNING: Could not set skin '%s' because it exeeds max limit of 23 characters\n", cmd->to);
-            break;
-        case 'n':
-            if (setskinbyname(cmd->from, cmd->to, demo) < 0)
-                printf("WARNING: Could not set skin '%s' because it exeeds max limit of 23 characters\n", cmd->to);
-            break;
-        default:
-            printf("WARNING: Unknown modifier for skin\n");
-        }
-        break;
-    default:
-        printf("WARNING: Unknown command type\n");
-        break;
-    }
-}

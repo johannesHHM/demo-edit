@@ -3,15 +3,6 @@
 
 #include "demo.h"
 
-typedef struct
-{
-    char cmdtype;
-    char settype;
-    int id;
-    char from[24];
-    char to[24];
-} cmdinput;
-
 int setnamebyid(int id, char *newname, demo *demo);
 int setnamebyname(char *oldname, char *newname, demo *demo);
 
@@ -25,7 +16,5 @@ int changemap(FILE *map, char *mapname, demo *demo);
 
 /* Writes the map in demo to out */
 int exportmap(FILE *out, demo *demo);
-
-void runcommand(cmdinput *cmd, demo *demo);
 
 #endif // COMMANDS_H
