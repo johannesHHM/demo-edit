@@ -89,6 +89,7 @@ void runrename(arg *renamearg)
 {
     int intid;
     int ret;
+
     if (sscanf(renamearg->opts[0], "%d", &intid) == 1)
         ret = setnamebyid(intid, renamearg->opts[1], &DEMO);
     else
@@ -98,6 +99,11 @@ void runrename(arg *renamearg)
     {
         printf("Error: failed to rename player '%s', reason: name too long\n", renamearg->opts[0]);
         exit(EXIT_FAILURE);
+    }
+
+    if (ret == 0)
+    {
+        printf("Info: found no player with id of '%s'", renamearg->opts[0]);
     }
 }
 
@@ -114,6 +120,11 @@ void runsetskin(arg *skinarg)
     {
         printf("Error: failed to set skin of player '%s', reason: skin name too long\n", skinarg->opts[0]);
         exit(EXIT_FAILURE);
+    }
+
+    if (ret == 0)
+    {
+        printf("Info: found no player with id of '%s'", skinarg->opts[0]);
     }
 }
 
