@@ -24,12 +24,12 @@ int readint(char **cp)
     (*cp)++;
 
     int sign = ((src >> 6) & 1);
-    result |= (src & 0b00111111);
+    result |= (src & 0x3f);
 
     for (int i = 0; i < 4; i++)
     {
         // printf("(%d, ", src);
-        if ((src & 0b10000000) == 0)
+        if ((src & 0x80) == 0)
             break;
 
         src = **cp;
@@ -37,12 +37,12 @@ int readint(char **cp)
 
         len++;
 
-        if (i == 3 && (src & 0b11110000) != 0)
+        if (i == 3 && (src & 0xf0) != 0)
             printf("[ WARNING ] Non zero int padding!\n");
 
-        result |= (src & 0b01111111) << (6 + 7 * i);
+        result |= (src & 0x7f) << (6 + 7 * i);
     }
-    if (len > 1 && src == 0b00000000)
+    if (len > 1 && src == 0x00)
         printf("[ WARNING ] Overlong int encoding!\n");
 
     result ^= -sign;
@@ -57,25 +57,25 @@ void writeint(int i, char **cp)
     int sign = i < 0;
     unsigned int in = i;
     in = (in ^ -sign);
-    char next = (in & 0b00111111);
+    char next = (in & 0x3f);
     in >>= 6;
 
-    char head = 0;
+    unsigned char head = 0;
     if (in != 0)
-        head |= 0b10000000;
+        head |= 0x80;
     if (sign != 0)
-        head |= 0b01000000;
+        head |= 0x40;
 
     **cp = head | next;
     (*cp)++;
 
     while (in != 0)
     {
-        next = (in & 0b01111111);
+        next = (in & 0x7f);
         in >>= 7;
 
         if (in != 0)
-            head = 0b10000000;
+            head = 0x80;
         else
             head = 0;
 

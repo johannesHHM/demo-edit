@@ -178,4 +178,3 @@ int exportmap(FILE *out, demo *demo)
 
     return 1;
 }
-
