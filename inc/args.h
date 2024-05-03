@@ -30,13 +30,13 @@ int addarg(char *value, char *desc, void (*runarg)(struct arg *));
 int addopt(char *flag, char *full, int numopt, char *value, char *desc, void (*runarg)(struct arg *));
 
 int parseargs(int argc, char *args[]);
-void freeargs();
-void runargs();
+void freeargs(void);
+void runargs(void);
 
 arg *getarg(int pos);
 arg *getopt(char *flag, int pos);
 
-void printhelp();
+void printhelp(void);
 
 void paerror(char *str);
 

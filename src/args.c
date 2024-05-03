@@ -173,7 +173,7 @@ int parseargs(int argc, char *args[])
     return 1;
 }
 
-void freeargs()
+void freeargs(void)
 {
     for (int i = 0; i < ARGC; i++)
     {
@@ -186,7 +186,7 @@ void freeargs()
         free(PARGS);
 }
 
-void runargs()
+void runargs(void)
 {
     for (int i = 0; i < ARGC; i++)
     {
@@ -219,7 +219,7 @@ arg *getopt(char *flag, int pos)
     return NULL;
 }
 
-void printhelp()
+void printhelp(void)
 {
     char inctype[ARGTYPELEN] = {0, 0, 0};
     int maxflag[ARGTYPELEN] = {0, 0, 0};
