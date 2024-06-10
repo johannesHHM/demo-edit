@@ -25,7 +25,7 @@ run: $(EXE)
 	$(EXE)
 
 clean:
-	@$(RM) -rv $(BIN_DIR) $(OBJ_DIR)
+	@$(RM) -rv $(BIN_DIR) $(OBJ_DIR) out.demo
 
 format:
 	clang-format -i --style=Microsoft src/*.c
