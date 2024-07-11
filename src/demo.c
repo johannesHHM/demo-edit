@@ -165,7 +165,7 @@ int readdemosnap(FILE *fp, demosnap *snap, int size)
 
     fread(data, 1, size, fp);
 
-    if (decompresshuff((char *)data, size, (char *)unpacked, 1034 * 8) < 0)
+    if (decompresshuff((char *)data, size, (char *)unpacked, 1024 * 8) < 0)
     {
         printf("[ ERROR ] error while decompressing snap cunk!\n");
         return 0;
@@ -194,7 +194,7 @@ int readdemosnap(FILE *fp, demosnap *snap, int size)
         else
             snap->items[i].numdata = (snap->offsets[i + 1] - snap->offsets[i]) / 4 - 1;
 
-        snap->items[i].data = (int *)malloc(size * sizeof(int));
+        snap->items[i].data = (int *)malloc(snap->items[i].numdata * sizeof(int));
 
         for (int y = 0; y < snap->items[i].numdata; y++)
             snap->items[i].data[y] = readint(&cp);
