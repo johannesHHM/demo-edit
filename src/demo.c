@@ -14,7 +14,7 @@
 #define CHUNK_NORMAL_TYPE_MASK 0x60   // 0b01100000
 #define CHUNK_NORMAL_SIZE_MASK 0x1f   // 0b00011111
 
-const char headermagic[7] = "TWDEMO\0";
+const char headermagic[7] = "TWDEMO";
 const unsigned char mapmagic[] = {0x6b, 0xe6, 0xda, 0x4a, 0xce, 0xbd, 0x38, 0x0c,
                                   0x9b, 0x5b, 0x12, 0x89, 0xc8, 0x42, 0xd7, 0x80};
 
