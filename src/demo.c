@@ -18,6 +18,30 @@ const char headermagic[7] = "TWDEMO";
 const unsigned char mapmagic[] = {0x6b, 0xe6, 0xda, 0x4a, 0xce, 0xbd, 0x38, 0x0c,
                                   0x9b, 0x5b, 0x12, 0x89, 0xc8, 0x42, 0xd7, 0x80};
 
+int snapitemsizes06[] = {
+    0,  // index 0 unused
+    10, // id 1
+    6,  // id 2
+    5,  // id 3
+    4,  // id 4
+    3,  // id 5
+    8,  // id 6
+    4,  // id 7
+    15, // id 8
+    22, // id 9
+    5,  // id 10
+    17, // id 11
+    3,  // id 12
+    2,  // id 13
+    2,  // id 14
+    2,  // id 15
+    2,  // id 16
+    3,  // id 17
+    3,  // id 18
+    3,  // id 19
+    3   // id 20
+};
+
 void freedemo(demo *demo)
 {
     free(demo->map.data);
@@ -42,8 +66,10 @@ void freedemo(demo *demo)
             free(chunk->data.message);
             break;
         case DEMODELTA:
-            free(chunk->data.delta->data);
-            free(chunk->data.delta);
+            free(chunk->data.delta->removeditemkeys);
+            for (int i = 0; i < chunk->data.delta->numitemdeltas; i++)
+                    free(chunk->data.delta->itemdeltas[i].data);
+            free(chunk->data.delta->itemdeltas);
             break;
         default:
             break;
@@ -218,13 +244,54 @@ int readdemomessage(FILE *fp, demomessage *message, int size)
 
 int readdemodelta(FILE *fp, demodelta *delta, int size)
 {
-    unsigned char data[size];
+    char data[size];
     if (fread(data, 1, size, fp) != (size_t)size)
         return -1;
 
-    delta->data = (char *)malloc(size);
-    memcpy(delta->data, data, size);
-    delta->datasize = size;
+#define BUFF_SIZE 1024 * 8
+    char unpacked[BUFF_SIZE];
+
+    int s = decompresshuff(data, size, unpacked, BUFF_SIZE);
+    if (s < 0)
+    {
+        printf("[ ERROR ] error while decompressing delta cunk!\n");
+        return 0;
+    }
+
+    char *cp = unpacked;
+    delta->numremoveditems = readint(&cp);
+    delta->numitemdeltas = readint(&cp);
+    int zeros = readint(&cp);
+
+    if (zeros != 0)
+        printf("[ WARNING ] zeroes in delta is not zero!\n");
+
+    if (delta->numremoveditems > 0)
+        delta->removeditemkeys = (int *)malloc(delta->numremoveditems * sizeof(int));
+
+    for (int i = 0; i < delta->numremoveditems; i++)
+        delta->removeditemkeys[i] = readint(&cp);
+
+    if (delta->numitemdeltas > 0)
+        delta->itemdeltas = (demodeltaitem *)malloc(delta->numitemdeltas * sizeof(demodeltaitem));
+
+    for (int i = 0; i < delta->numitemdeltas; i++)
+    {
+        demodeltaitem *item = &delta->itemdeltas[i];
+        item->type = readint(&cp);
+        item->id = readint(&cp);
+
+        // TODO: 1 <= type <= 20 is 0.6 protocol spesific
+        if (item->type >= 1 && item->type <= 20)
+            item->size = snapitemsizes06[item->type];
+        else
+            item->size = readint(&cp);
+
+        item->data = (int *)malloc(item->size * sizeof(int));
+
+        for (int i = 0; i < item->size; i++)
+            item->data[i] = readint(&cp);
+    }
 
     return 1;
 }
@@ -495,8 +562,39 @@ int writedemomessage(FILE *fp, demomessage *message)
 
 int writedemodelta(FILE *fp, demodelta *delta)
 {
-    writedemochunkheader(fp, DEMODELTA, delta->datasize);
-    fwrite(delta->data, 1, delta->datasize, fp);
+    char compressed[64 * 1024];
+    char decompressed[64 * 1024];
+
+    char *cp = decompressed;
+
+    writeint(delta->numremoveditems, &cp);
+    writeint(delta->numitemdeltas, &cp);
+    writeint(0, &cp);
+
+    for (int i = 0; i < delta->numremoveditems; i++)
+        writeint(delta->removeditemkeys[i], &cp);
+
+    for (int i = 0; i < delta->numitemdeltas; i++)
+    {
+        demodeltaitem *item = &delta->itemdeltas[i];
+        writeint(item->type, &cp);
+        writeint(item->id, &cp);
+
+        // TODO: 1 <= type <= 20 is 0.6 protocol spesific
+        if (!(item->type >= 1 && item->type <= 20))
+            writeint(item->size, &cp);
+
+        for (int i = 0; i < item->size; i++)
+            writeint(item->data[i], &cp);
+    }
+
+
+    int size = cp - decompressed;
+
+    int datasize = compresshuff(decompressed, size, compressed, 64 * 1024);
+
+    writedemochunkheader(fp, DEMODELTA, datasize);
+    fwrite(compressed, 1, datasize, fp);
 
     return 1;
 }
@@ -586,7 +684,24 @@ void printdemomessage(demomessage *message)
 
 void printdemodelta(demodelta *delta)
 {
-    printf("DELTA={datasize: %d}\n", delta->datasize);
+    printf("DELTA={numremoveditems: %d, numitemdeltas: %d\n  removeditems: [ ", delta->numremoveditems, delta->numitemdeltas);
+
+    for (int i = 0; i < delta->numremoveditems; i++) 
+    {
+        short type = (delta->removeditemkeys[i] >> 16) & 0xffff;
+        short id = (delta->removeditemkeys[i] & 0xffff);
+        printf("(type: %d, id: %d)%s ", type, id, (i != delta->numremoveditems - 1) ? "," : "");
+    }
+
+    printf("],\n  itemdeltas: [\n");
+    for (int i = 0; i < delta->numitemdeltas; i++)
+    {
+        printf("    (type: %d, id: %d) {", delta->itemdeltas[i].type, delta->itemdeltas[i].id);
+        for (int y = 0; y < delta->itemdeltas[i].size; y++)
+            printf("%x%s", delta->itemdeltas[i].data[y], (y != delta->itemdeltas[i].size - 1) ? "," : "");
+        printf("}\n");
+    }
+    printf("]}\n");
 }
 
 void printdemo(demo *demo, char printchunks)

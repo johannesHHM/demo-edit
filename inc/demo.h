@@ -63,8 +63,18 @@ typedef struct
 
 typedef struct
 {
-    int datasize;
-    char *data;
+    unsigned short type;
+    unsigned short id;
+    int size;
+    int *data;
+} demodeltaitem;
+
+typedef struct
+{
+    int numremoveditems;
+    int numitemdeltas;
+    int *removeditemkeys;
+    demodeltaitem *itemdeltas;
 } demodelta;
 
 typedef struct
