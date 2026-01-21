@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+#define DEMO_TIMELINE_LENGTH 260
+
 typedef enum
 {
     DEMOTICK = 0,
@@ -27,7 +29,7 @@ typedef struct
 /* demotimeline struct, only contains the raw data */
 typedef struct
 {
-    char data[260];
+    char data[DEMO_TIMELINE_LENGTH];
 } demotimeline;
 
 /* demomap struct */

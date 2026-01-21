@@ -18,17 +18,19 @@ const char headermagic[7] = "TWDEMO";
 const unsigned char mapmagic[] = {0x6b, 0xe6, 0xda, 0x4a, 0xce, 0xbd, 0x38, 0x0c,
                                   0x9b, 0x5b, 0x12, 0x89, 0xc8, 0x42, 0xd7, 0x80};
 
+#define BUFF_SIZE 1024 * 64
+
 int snapitemsizes06[] = {
-    0,  // index 0 unused
-    10, // id 1
-    6,  // id 2
-    5,  // id 3
-    4,  // id 4
-    3,  // id 5
-    8,  // id 6
-    4,  // id 7
-    15, // id 8
-    22, // id 9
+    0,  // index 0, unused
+    10, // id  1
+    6,  // id  2
+    5,  // id  3
+    4,  // id  4
+    3,  // id  5
+    8,  // id  6
+    4,  // id  7
+    15, // id  8
+    22, // id  9
     5,  // id 10
     17, // id 11
     3,  // id 12
@@ -68,7 +70,7 @@ void freedemo(demo *demo)
         case DEMODELTA:
             free(chunk->data.delta->removeditemkeys);
             for (int i = 0; i < chunk->data.delta->numitemdeltas; i++)
-                    free(chunk->data.delta->itemdeltas[i].data);
+                free(chunk->data.delta->itemdeltas[i].data);
             free(chunk->data.delta->itemdeltas);
             break;
         default:
@@ -121,7 +123,7 @@ int readdemoheader(FILE *fp, demoheader *dh)
 
 int readdemotimeline(FILE *fp, demotimeline *dt)
 {
-    if (fread(dt->data, 1, 260, fp) != 260)
+    if (fread(dt->data, 1, DEMO_TIMELINE_LENGTH, fp) != DEMO_TIMELINE_LENGTH)
         return -1;
     return 1;
 }
@@ -187,11 +189,11 @@ int readdemotick(FILE *fp, char chunkhead, demotick *tick, unsigned char ver)
 int readdemosnap(FILE *fp, demosnap *snap, int size)
 {
     char data[size];
-    char unpacked[1024 * 8];
+    char unpacked[BUFF_SIZE];
 
     fread(data, 1, size, fp);
 
-    if (decompresshuff((char *)data, size, (char *)unpacked, 1024 * 8) < 0)
+    if (decompresshuff((char *)data, size, (char *)unpacked, BUFF_SIZE) < 0)
     {
         printf("[ ERROR ] error while decompressing snap cunk!\n");
         return 0;
@@ -248,7 +250,6 @@ int readdemodelta(FILE *fp, demodelta *delta, int size)
     if (fread(data, 1, size, fp) != (size_t)size)
         return -1;
 
-#define BUFF_SIZE 1024 * 8
     char unpacked[BUFF_SIZE];
 
     int s = decompresshuff(data, size, unpacked, BUFF_SIZE);
@@ -445,7 +446,7 @@ int writedemoheader(FILE *fp, demoheader *dh)
 
 int writedemotimeline(FILE *fp, demotimeline *dt)
 {
-    if (fwrite(dt->data, 1, 260, fp) != 260)
+    if (fwrite(dt->data, 1, DEMO_TIMELINE_LENGTH, fp) != DEMO_TIMELINE_LENGTH)
         return -1;
     return 1;
 }
@@ -523,8 +524,8 @@ int writedemotick(FILE *fp, demotick *tick, unsigned char ver)
 
 int writedemosnap(FILE *fp, demosnap *snap)
 {
-    char compressed[64 * 1024];
-    char decompressed[64 * 1024];
+    char compressed[BUFF_SIZE];
+    char decompressed[BUFF_SIZE];
 
     char *cp = decompressed;
 
@@ -544,7 +545,7 @@ int writedemosnap(FILE *fp, demosnap *snap)
     }
     int size = cp - decompressed;
 
-    int datasize = compresshuff(decompressed, size, compressed, 64 * 1024);
+    int datasize = compresshuff(decompressed, size, compressed, BUFF_SIZE);
 
     writedemochunkheader(fp, DEMOSNAP, datasize);
     fwrite(compressed, 1, datasize, fp);
@@ -562,8 +563,8 @@ int writedemomessage(FILE *fp, demomessage *message)
 
 int writedemodelta(FILE *fp, demodelta *delta)
 {
-    char compressed[64 * 1024];
-    char decompressed[64 * 1024];
+    char compressed[BUFF_SIZE];
+    char decompressed[BUFF_SIZE];
 
     char *cp = decompressed;
 
@@ -588,10 +589,9 @@ int writedemodelta(FILE *fp, demodelta *delta)
             writeint(item->data[i], &cp);
     }
 
-
     int size = cp - decompressed;
 
-    int datasize = compresshuff(decompressed, size, compressed, 64 * 1024);
+    int datasize = compresshuff(decompressed, size, compressed, BUFF_SIZE);
 
     writedemochunkheader(fp, DEMODELTA, datasize);
     fwrite(compressed, 1, datasize, fp);
@@ -684,9 +684,10 @@ void printdemomessage(demomessage *message)
 
 void printdemodelta(demodelta *delta)
 {
-    printf("DELTA={numremoveditems: %d, numitemdeltas: %d\n  removeditems: [ ", delta->numremoveditems, delta->numitemdeltas);
+    printf("DELTA={numremoveditems: %d, numitemdeltas: %d\n  removeditems: [ ", delta->numremoveditems,
+           delta->numitemdeltas);
 
-    for (int i = 0; i < delta->numremoveditems; i++) 
+    for (int i = 0; i < delta->numremoveditems; i++)
     {
         short type = (delta->removeditemkeys[i] >> 16) & 0xffff;
         short id = (delta->removeditemkeys[i] & 0xffff);
