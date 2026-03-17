@@ -55,14 +55,15 @@ Argument:
   <demo> Sets input demo
 
 Options:
-  -r, --rename        <id> <name>  Renames player with id to name
-  -s, --skin          <id> <name>  Set skin of player with id to skin
-  -m, --map           <map>        Changes the map of demo to map
-  -e, --extract-map   <file>       Saves the map of demo to file
-  -o, --output        <file>       Saves the output demo to file
-  -i, --info                       Prints info of demo
-  -I, --extended-info              Prints extended info of demo
-  -h, --help                       Prints this help info
+  -r, --rename        <id/name> <name>  Renames player with id/name to name
+  -s, --skin          <id/name> <skin>  Set skin of player with id/name to skin
+  -m, --map           <map>             Changes the map of demo to map
+  -e, --extract-map   <file>            Saves the map of demo to file
+  -o, --output        <file>            Saves the output demo to file
+  -i, --info                            Prints info of demo
+  -I, --extended-info                   Prints extended info of demo
+  -c, --chat                            Prints the demo chat log
+  -h, --help                            Prints this help info
 ```
 
 ## credits

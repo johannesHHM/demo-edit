@@ -1,4 +1,5 @@
 #include "../inc/args.h"
+#include "../inc/chat.h"
 #include "../inc/commands.h"
 #include "../inc/demo.h"
 #include "../inc/huffman.h"
@@ -172,6 +173,7 @@ int main(int argc, char *argv[])
     addopt("-o", "--output", 1, "<file>", "Saves the output demo to file", NULL);
     addopt("-i", "--info", 0, NULL, "Prints info of demo", NULL);
     addopt("-I", "--extended-info", 0, NULL, "Prints extended info of demo", NULL);
+    addopt("-c", "--chat", 0, NULL, "Prints the demo chat log", NULL);
     addopt("-h", "--help", 0, NULL, "Prints this help info", NULL);
 
     if (!parseargs(argc, argv))
@@ -200,6 +202,7 @@ int main(int argc, char *argv[])
     arg *exmarg = getopt("-e", 0);
     arg *infarg = getopt("-i", 0);
     arg *Infarg = getopt("-I", 0);
+    arg *chtarg = getopt("-c", 0);
 
     if (exmarg)
         runextractmap(exmarg);
@@ -211,6 +214,9 @@ int main(int argc, char *argv[])
         printdemo(&DEMO, 1);
     else if (infarg)
         printdemo(&DEMO, 0);
+
+    if (chtarg)
+        printchat(&DEMO);
 
     int i = 0;
     arg *opt;
