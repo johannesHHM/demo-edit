@@ -173,7 +173,6 @@ void gameprintchatmessage(game *g, demomessage *m)
 
 void printchat(demo *demo)
 {
-    int i;
     game g;
     demochunk *c;
 
