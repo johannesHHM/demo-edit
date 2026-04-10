@@ -641,17 +641,17 @@ int writedemo(FILE *fp, demo *demo)
 void printdemoheader(demoheader *header)
 {
     if (header->version == 6)
-        printf("version: v6ddnet\n");
+        printf("version:    v6ddnet\n");
     else
-        printf("version: v%d\n", header->version);
+        printf("version:    v%d\n", header->version);
 
     printf("netversion: %s\n", header->netversion);
-    printf("mapname: %s\n", header->mapname);
-    printf("mapsize: %d\n", header->mapsize);
-    printf("mapcrc: %d\n", header->mapcrc);
-    printf("type: %s\n", header->type);
-    printf("length: %d\n", header->length);
-    printf("timestamp: %s\n", header->timestamp);
+    printf("mapname:    %s\n", header->mapname);
+    printf("mapsize:    %d\n", header->mapsize);
+    printf("mapcrc:     %d\n", header->mapcrc);
+    printf("type:       %s\n", header->type);
+    printf("length:     %d\n", header->length);
+    printf("timestamp:  %s\n", header->timestamp);
 }
 
 void printdemotick(demotick *tick)
