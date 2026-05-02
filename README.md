@@ -1,6 +1,6 @@
 # dedit
 
-![Screenshot](preview/banner.png)
+![Screenshot](https://jhhm.no/img/dedit-banner.jpg)
 
 ## about
 
