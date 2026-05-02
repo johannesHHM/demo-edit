@@ -1,3 +1,19 @@
+/* This file is part of dedit - a tool for editing Teeworlds/DDNet demo files
+   Copyright (C) 2024 JHHM
+
+   Dedit is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   Dedit is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with dedit.  If not, see <https://www.gnu.org/licenses/>. */
+
 #include <stdio.h>
 
 int frombigendian(const unsigned char in[4])
@@ -13,8 +29,12 @@ void tobigendian(const int in, unsigned char out[4])
     out[3] = in & 0xff;
 }
 
-/* function is lifted from */
-/* https://github.com/heinrich5991/libtw2/blob/b9286674da94d3d45b9c10ffce517af394e2d58c/packer/src/lib.rs#L62 */
+/*
+  Function is derived from libtw2 code (MIT/Apache-2.0 License).
+  See NOTICES file for full license details.
+
+  https://github.com/heinrich5991/libtw2/blob/b9286674da94d3d45b9c10ffce517af394e2d58c/packer/src/lib.rs#L62
+*/
 int readint(char **cp)
 {
     int result = 0;
@@ -50,8 +70,12 @@ int readint(char **cp)
     return result;
 }
 
-/* function is lifted from */
-/* https://github.com/heinrich5991/libtw2/blob/b9286674da94d3d45b9c10ffce517af394e2d58c/packer/src/lib.rs#L105 */
+/*
+  Function is derived from libtw2 code (MIT/Apache-2.0 License).
+  See NOTICES file for full license details.
+
+  https://github.com/heinrich5991/libtw2/blob/b9286674da94d3d45b9c10ffce517af394e2d58c/packer/src/lib.rs#L105
+*/
 void writeint(int i, char **cp)
 {
     int sign = i < 0;
@@ -84,8 +108,12 @@ void writeint(int i, char **cp)
     }
 }
 
-/* function is copied from */
-/* https://github.com/teeworlds/teeworlds/blob/a1911c8f7d8458fb4076ef8e7651e8ef5e91ab3e/src/game/gamecore.h#L68 */
+/*
+  Function is derived from libtw2 code (MIT/Apache-2.0 License).
+  See NOTICES file for full license details.
+
+  https://github.com/teeworlds/teeworlds/blob/a1911c8f7d8458fb4076ef8e7651e8ef5e91ab3e/src/game/gamecore.h#L68
+*/
 void intstostr(const int *ints, int num, char *str)
 {
     while (num)

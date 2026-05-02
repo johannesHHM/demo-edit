@@ -1,4 +1,4 @@
-# demo-edit
+# dedit
 
 ![Screenshot](preview/banner.png)
 
@@ -6,7 +6,9 @@
 
 Change names, skins, maps and more of a teeworlds demo file. 
 
-demo-edit is tested with demos of version 5 and 6 (ddnet), but theoreticly supports version 3 and 4 aswell. Only supports teeworlds 0.6 network protocol.
+Dedit is tested with demo versions 5 and 6 (ddnet), but theoreticly 
+supports version 3 and 4 aswell. Dedit currently only supports the
+teeworlds 0.6 network protocol.
 
 ## compile
 
@@ -19,7 +21,7 @@ make
 ## run
 
 ```sh
-./build/dedit --help
+./dedit --help
 ```
 
 ## examples
@@ -31,12 +33,14 @@ Prints info of 'clip.demo'. Info consists of demo header and chunk counts.
 ./dedit testdata/clip.demo --info
 ```
 
-Rename player with clientid 3 to 'holymadtee', change map to 'ice.map' and save the output to 'out.demo'.
+Rename player with clientid 3 to 'holymadtee', change map to 'ice.map'
+and save the output to 'out.demo'.
 ```sh
 ./dedit testdata/clip.demo --rename 3 holymadtee --map testdata/ice.map --output out.demo
 ```
 
-Set the skin of player with name 'New Hero' to 'bomb', rename 'New Hero' to 'Bob-omb', change map to 'jungle.map' and save the output to 'out.demo'.
+Set the skin of player with name 'New Hero' to 'bomb', rename 'New Hero'
+to 'Bob-omb', change map to 'jungle.map' and save the output to 'out.demo'.
 ```sh
 ./dedit testdata/clip.demo -s "New Hero" bomb -r "New Hero" Bob-omb -m testdata/jungle.map -o out.demo
 ```
@@ -68,10 +72,20 @@ Options:
 
 ## credits
 
-Some functions/implementations are heavily inspired by other sources. They are commented in the code with links to their referances. Under are some credits:
+Some functions/implementations are heavily inspired by other sources.
+They are commented in the code with links to their referances.
+Under are some credits:
 
 - [libtw2](https://github.com/heinrich5991/libtw2): variable length int implementation, demo/snapshot documentation
 - [teeworlds](https://github.com/teeworlds/teeworlds): huffman implementation
 - [ddnet](https://github.com/ddnet/ddnet): some demo writing specifics
 
+## license
 
+This project is licensed under the GNU General Public License Version 3
+(or, at your option, any later version). See the `LICENSE` file for the
+full license text.
+
+This project also includes code that is derived from other sources, with
+their own licenses. See the `NOTICES` file for additional copyright,
+license, and attribution information.
