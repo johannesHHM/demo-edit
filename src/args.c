@@ -1,4 +1,4 @@
-#include "../inc/args.h"
+#include "args.h"
 
 #include <stdio.h>
 #include <stdlib.h>

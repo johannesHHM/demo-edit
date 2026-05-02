@@ -1,6 +1,6 @@
-#include "../inc/commands.h"
-#include "../inc/demo.h"
-#include "../inc/pack.h"
+#include "commands.h"
+#include "demo.h"
+#include "pack.h"
 
 #include <stdio.h>
 #include <stdlib.h>

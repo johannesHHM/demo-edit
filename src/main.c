@@ -1,8 +1,8 @@
-#include "../inc/args.h"
-#include "../inc/chat.h"
-#include "../inc/commands.h"
-#include "../inc/demo.h"
-#include "../inc/huffman.h"
+#include "args.h"
+#include "chat.h"
+#include "commands.h"
+#include "demo.h"
+#include "huffman.h"
 
 #include <stdio.h>
 #include <stdlib.h>

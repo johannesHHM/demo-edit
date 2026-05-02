@@ -1,7 +1,8 @@
-#include "../inc/chat.h"
-#include "../inc/demo.h"
-#include "../inc/huffman.h"
-#include "../inc/pack.h"
+#include "chat.h"
+#include "demo.h"
+#include "huffman.h"
+#include "pack.h"
+
 #include <stdio.h>
 #include <string.h>
 

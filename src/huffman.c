@@ -1,6 +1,6 @@
 /* huffman compresion based on teeworlds/ddnet huffman */
 /*{ https://github.com/teeworlds/teeworlds/blob/master/src/engine/shared/huffman.cpp } */
-#include "../inc/huffman.h"
+#include "huffman.h"
 
 #define HUFF_MAX_NODES (HUFF_MAX_SYMBOLS) * 2 - 1
 #define HUFF_MAX_SYMBOLS HUFF_EOF_SYMBOL + 1
