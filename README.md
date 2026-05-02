@@ -28,17 +28,17 @@ Under are a couple of examples that should run without issue after compiling.
 
 Prints info of 'clip.demo'. Info consists of demo header and chunk counts.
 ```sh
-./build/dedit testdata/clip.demo --info
+./dedit testdata/clip.demo --info
 ```
 
 Rename player with clientid 3 to 'holymadtee', change map to 'ice.map' and save the output to 'out.demo'.
 ```sh
-./build/dedit testdata/clip.demo --rename 3 holymadtee --map testdata/ice.map --output out.demo
+./dedit testdata/clip.demo --rename 3 holymadtee --map testdata/ice.map --output out.demo
 ```
 
 Set the skin of player with name 'New Hero' to 'bomb', rename 'New Hero' to 'Bob-omb', change map to 'jungle.map' and save the output to 'out.demo'.
 ```sh
-./build/dedit testdata/clip.demo -s "New Hero" bomb -r "New Hero" Bob-omb -m testdata/jungle.map -o out.demo
+./dedit testdata/clip.demo -s "New Hero" bomb -r "New Hero" Bob-omb -m testdata/jungle.map -o out.demo
 ```
 
 Tip: 'out.demo' can be quickly viewed by running

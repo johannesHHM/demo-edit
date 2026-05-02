@@ -1,34 +1,64 @@
-SRC_DIR := src
-BIN_DIR := build
-OBJ_DIR := $(BIN_DIR)/obj
+.POSIX:
 
-EXE := $(BIN_DIR)/dedit
-SRC := $(wildcard $(SRC_DIR)/*.c)
-OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+CC       = c99
+CFLAGS   = -O2 -Wall -Wextra -pedantic-errors
+CPPFLAGS = -Iinc
 
-CFLAGS := -Wall -Wextra -std=c99 -pedantic-errors
+TARGET = dedit
+OBJDIR = obj
 
-.PHONY: all clean run format
+SRC = \
+	src/args.c \
+	src/chat.c \
+	src/commands.c \
+	src/demo.c \
+	src/huffman.c \
+	src/main.c \
+	src/pack.c
 
-all: $(EXE)
+OBJ = \
+	obj/args.o \
+	obj/chat.o \
+	obj/commands.o \
+	obj/demo.o \
+	obj/huffman.o \
+	obj/main.o \
+	obj/pack.o
 
-$(EXE): $(OBJ) | $(BIN_DIR)
-	$(CC) $^  -o $@
+all: $(OBJDIR) $(TARGET)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(BIN_DIR) $(OBJ_DIR):
-	mkdir -p $@
-
-run: $(EXE)
-	$(EXE)
+$(TARGET): $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o $@
 
 clean:
-	@$(RM) -rv $(BIN_DIR) $(OBJ_DIR) out.demo
+	rm -rf $(OBJDIR) $(TARGET)
 
 format:
 	clang-format -i --style=Microsoft src/*.c
 	clang-format -i --style=Microsoft inc/*.h
 
--include $(OBJ:.o=.d)
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+obj/args.o: src/args.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c src/args.c -o obj/args.o
+
+obj/chat.o: src/chat.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c src/chat.c -o obj/chat.o
+
+obj/commands.o: src/commands.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c src/commands.c -o obj/commands.o
+
+obj/demo.o: src/demo.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c src/demo.c -o obj/demo.o
+
+obj/huffman.o: src/huffman.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c src/huffman.c -o obj/huffman.o
+
+obj/main.o: src/main.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c src/main.c -o obj/main.o
+
+obj/pack.o: src/pack.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c src/pack.c -o obj/pack.o
+
+.PHONY: all clean format
