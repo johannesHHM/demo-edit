@@ -14,6 +14,8 @@
    You should have received a copy of the GNU General Public License
    along with dedit.  If not, see <https://www.gnu.org/licenses/>. */
 
+#define _POSIX_C_SOURCE 200112L
+
 #include "args.h"
 #include "chat.h"
 #include "commands.h"

@@ -21,6 +21,8 @@
   https://github.com/teeworlds/teeworlds/blob/master/src/engine/shared/huffman.cpp
 */
 
+#define _POSIX_C_SOURCE 200112L
+
 #include "huffman.h"
 
 #define HUFF_MAX_NODES (HUFF_MAX_SYMBOLS) * 2 - 1
