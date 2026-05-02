@@ -18,7 +18,7 @@
 
 CC       = c99
 CFLAGS   = -O2 -Wall -Wextra -pedantic-errors
-CPPFLAGS = -Iinc
+CPPFLAGS = -Iinclude
 
 TARGET = dedit
 OBJDIR = obj
