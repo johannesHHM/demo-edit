@@ -180,7 +180,7 @@ int compresshuff(const char *inputbuff, int inputsize, char *outputbuff, int out
     int outputlen = 0;
     char bits = 0;
     char numbits = 0;
-    unsigned short symbol;
+    unsigned short symbol = 0;
 
     for (int y = 0; y < inputsize; y++)
     {
