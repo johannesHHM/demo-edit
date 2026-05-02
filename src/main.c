@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
 {
     inithuff(NULL);
 
-    setinfo("d(emo)edit, a tool for manipulating teeworlds demos");
+    setinfo("dedit - a tool for editing Teeworlds/DDNet demo files");
     setusage("dedit <demo> [OPTIONS]");
 
     addarg("<demo>", "Sets input demo", setdemo);
