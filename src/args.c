@@ -246,11 +246,11 @@ void printhelp(void)
         printf("%s\n\n", inf);
 
     if (usg)
-        printf("\033[4mUsage:\033[0m %s\n", usg);
+        printf("Usage: %s\n", usg);
 
     if (inctype[ARGUMENT])
     {
-        printf("\n\033[4mArgument%c:\033[0m\n", (inctype[ARGUMENT] < 2) ? '\0' : 's');
+        printf("\nArgument%c:\n", (inctype[ARGUMENT] < 2) ? '\0' : 's');
         for (int i = 0; i < PARGC; i++)
         {
             parg *pa = &PARGS[i];
@@ -261,7 +261,7 @@ void printhelp(void)
 
     if (inctype[OPTION])
     {
-        printf("\n\033[4mOption%c:\033[0m\n", (inctype[OPTION] < 2) ? '\0' : 's');
+        printf("\nOption%c:\n", (inctype[OPTION] < 2) ? '\0' : 's');
         for (int i = 0; i < PARGC; i++)
         {
             parg *pa = &PARGS[i];
