@@ -1,0 +1,121 @@
+.\" This file is part of dedit - a tool for editing Teeworlds/DDNet demo files
+.\" Copyright (C) 2026 JHHM
+.\"
+.\" Dedit is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" Dedit is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with dedit.  If not, see <https://www.gnu.org/licenses/>.
+.TH DEDIT 1 "May 2. 2026" "dedit" "User Commands"
+.SH NAME
+dedit \- edit Teeworlds/DDNet demo files
+.SH SYNOPSIS
+.B dedit
+.I demo
+.RI [ OPTIONS ]
+.SH DESCRIPTION
+.B dedit
+is a tool for editing Teeworlds and DDNet demo files.
+
+The input demo file is specified by the
+.I demo
+argument.
+
+For options taking an
+.I ID/NAME
+argument, if the value is numeric,
+.B dedit
+first attempts to interpret it as a player ID. If no matching player ID
+is found, it falls back to treating the value as a player name.
+.SH ARGUMENTS
+.TP
+.I demo
+Input demo file.
+.SH OPTIONS
+.TP
+.BR \-r ", " \-\-rename " " \fIID/NAME\fR " " \fINAME\fR
+Rename the player identified by
+.I ID/NAME
+to
+.IR NAME .
+.TP
+.BR \-s ", " \-\-skin " " \fIID/NAME\fR " " \fISKIN\fR
+Set the skin of the player identified by
+.I ID/NAME
+to
+.IR SKIN .
+.TP
+.BR \-m ", " \-\-map " " \fIMAP\fR
+Change the map of the demo to the map file
+.IR MAP .
+This will only produce sensible results if the replacement map has the
+same game layer(s) as the original map.
+.TP
+.BR \-o ", " \-\-output " " \fIFILE\fR
+Write the modified demo to
+.IR FILE .
+.TP
+.BR \-e ", " \-\-extract-map " " \fIFILE\fR
+Extract the embedded map from the demo and save it to
+.IR FILE .
+.TP
+.BR \-c ", " \-\-chat
+Print the demo chat log. Tries to in reproduce the same output
+as the DDNet tool
+.BR demo_extract_chat .
+.TP
+.BR \-i ", " \-\-info
+Print the demo header and chunk totals.
+.TP
+.BR \-I ", " \-\-extended-info
+Print the demo header and every information for every chunk in the demo.
+.TP
+.BR \-h ", " \-\-help
+Display help information and exit.
+.SH EXAMPLES
+Rename player with name \fINew Hero\fR to \fIholymadtee\fR.
+Save the result to \fIout.demo\fR.
+.RS
+.B $ dedit demo.demo --rename \(dqNew Hero\(dq holymadtee --output out.demo
+.RE
+
+Change the demo map to \fIfng_AB_1.map\fR, and change the skin of player
+with ID \fI3\fR to \fIbrownbear\fR. Save the result to \fInew.demo\fR.
+.RS
+.B $ dedit demo.demo -m fng_AB_1.map -s 3 brownbear -o new.demo
+.RE
+
+Extract the embedded map into file \fImesa.map\fR.
+.RS
+.B $ dedit demo.demo --extract-map mesa.map
+.RE
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B >0
+An error occurred.
+.SH COPYING
+Copyright (C) 2026 JHHM.
+
+License GPLv3+: GNU GPL version 3 or later
+<https://gnu.org/licenses/gpl.html>.
+
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+.SH AUTHORS
+Written by JHHM.
+
+More information about
+.B dedit
+can be found at: <https://jhhm.no/software/dedit/>
+.SH SEE ALSO
+.BR DDNet (6),
