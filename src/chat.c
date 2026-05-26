@@ -140,7 +140,7 @@ void gameprintchatmessage(game *g, demomessage *m)
     // TODO: magic numbs
     char unpacked[1024 * 8];
     char raw[1024 * 8];
-    int rawlen, n, clientid, seconds, min, sec;
+    int  n, clientid, seconds, min, sec;
     char *unpackedptr;
     char *rawptr;
 
@@ -149,7 +149,6 @@ void gameprintchatmessage(game *g, demomessage *m)
 
     unpackedptr = unpacked;
     rawptr = raw;
-    rawlen = 0;
 
     while (*unpackedptr)
     {
@@ -157,7 +156,6 @@ void gameprintchatmessage(game *g, demomessage *m)
 
         memcpy(rawptr, &n, 4);
         rawptr += 4;
-        rawlen += 4;
     }
     *(rawptr) = 0;
 
