@@ -30,7 +30,9 @@ SRC = \
 	src/demo.c \
 	src/huffman.c \
 	src/main.c \
-	src/pack.c
+	src/pack.c \
+	src/snap.c \
+	src/merge.c
 
 OBJ = \
 	obj/args.o \
@@ -39,7 +41,9 @@ OBJ = \
 	obj/demo.o \
 	obj/huffman.o \
 	obj/main.o \
-	obj/pack.o
+	obj/pack.o \
+	src/snap.o \
+	src/merge.o
 
 all: $(OBJDIR) $(TARGET)
 
@@ -76,5 +80,12 @@ obj/main.o: src/main.c
 
 obj/pack.o: src/pack.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c src/pack.c -o obj/pack.o
+
+obj/snap.o: src/snap.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c src/snap.c -o obj/snap.o
+
+obj/merge.o: src/merge.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c src/merge.c -o obj/merge.o
+
 
 .PHONY: all clean format

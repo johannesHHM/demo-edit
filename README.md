@@ -45,6 +45,12 @@ to 'Bob-omb', change map to 'jungle.map' and save the output to 'out.demo'.
 ./dedit testdata/clip.demo -s "New Hero" bomb -r "New Hero" Bob-omb -m testdata/jungle.map -o out.demo
 ```
 
+Merge demos 'catchup_NewHero.demo', 'catchup_hex.demo and 'catchup_faceless.demo'
+and save the output to 'out.demo'.
+```sh
+./dedit testdata/catchup_NewHero.demo -M catchup_hex.demo -M testdata/catchup_faceless.demo -o out.demo
+```
+
 Tip: 'out.demo' can be quickly viewed by running
 ```sh
 DDNet out.demo
@@ -62,6 +68,7 @@ Options:
   -r, --rename        <id/name> <name>  Renames player with id/name to name
   -s, --skin          <id/name> <skin>  Set skin of player with id/name to skin
   -m, --map           <map>             Changes the map of demo to map
+  -M, --merge         <demo>            Merges the game data of demo into input demo
   -e, --extract-map   <file>            Saves the map of demo to file
   -o, --output        <file>            Saves the output demo to file
   -i, --info                            Prints info of demo

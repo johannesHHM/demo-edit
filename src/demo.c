@@ -65,10 +65,14 @@ int snapitemsizes06[] = {
 void freedemo(demo *demo)
 {
     free(demo->map.data);
+    freedemodata(&demo->data);
+}
 
-    for (int i = 0; i < demo->data.numchunks; i++)
+void freedemodata(demodata *data)
+{
+    for (int i = 0; i < data->numchunks; i++)
     {
-        demochunk *chunk = &demo->data.chunks[i];
+        demochunk *chunk = &data->chunks[i];
         switch (chunk->type)
         {
         case DEMOTICK:
@@ -90,12 +94,15 @@ void freedemo(demo *demo)
             for (int i = 0; i < chunk->data.delta->numitemdeltas; i++)
                 free(chunk->data.delta->itemdeltas[i].data);
             free(chunk->data.delta->itemdeltas);
+            free(chunk->data.delta);
             break;
         default:
             break;
         }
     }
-    free(demo->data.chunks);
+    free(data->chunks);
+    data->chunks = NULL;
+    data->numchunks = 0;
 }
 
 /* readers */
@@ -284,6 +291,9 @@ int readdemodelta(FILE *fp, demodelta *delta, int size)
 
     if (zeros != 0)
         printf("[ WARNING ] zeroes in delta is not zero!\n");
+
+     delta->removeditemkeys = NULL;
+     delta->itemdeltas = NULL;
 
     if (delta->numremoveditems > 0)
         delta->removeditemkeys = (int *)malloc(delta->numremoveditems * sizeof(int));

@@ -13,7 +13,7 @@
 .\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with dedit.  If not, see <https://www.gnu.org/licenses/>.
-.TH DEDIT 1 "May 2. 2026" "dedit" "User Commands"
+.TH DEDIT 1 "October 7. 2026" "dedit" "User Commands"
 .SH NAME
 dedit \- edit Teeworlds/DDNet demo files
 .SH SYNOPSIS
@@ -58,6 +58,15 @@ Change the map of the demo to the map file
 This will only produce sensible results if the replacement map has the
 same game layer(s) as the original map.
 .TP
+.BR \-M ", " \-\-merge " " \fIDEMO\fR
+Merge the game data of
+.I DEMO
+into the input demo. Ment for merging demos from the same round to create
+a demo with data from both demos. The point of view is the input demo where it 
+has data, and 
+.I DEMO
+elsewhere. Can be given multiple times to merge several demos.
+.TP
 .BR \-o ", " \-\-output " " \fIFILE\fR
 Write the modified demo to
 .IR FILE .
@@ -90,6 +99,12 @@ Change the demo map to \fIfng_AB_1.map\fR, and change the skin of player
 with ID \fI3\fR to \fIbrownbear\fR. Save the result to \fInew.demo\fR.
 .RS
 .B $ dedit demo.demo -m fng_AB_1.map -s 3 brownbear -o new.demo
+.RE
+
+Merge the demo \fIother.demo\fR, recorded by another player on the same
+server, into \fIdemo.demo\fR. Save the result to \fImerged.demo\fR.
+.RS
+.B $ dedit demo.demo --merge other.demo --output merged.demo
 .RE
 
 Extract the embedded map into file \fImesa.map\fR.

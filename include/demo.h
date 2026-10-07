@@ -172,4 +172,8 @@ void printdemo(demo *demo, char printchunks);
 /* Sets demo to NULL */
 void freedemo(demo *demo);
 
+/* Frees all chunks in data */
+/* Sets data to empty */
+void freedemodata(demodata *data);
+
 #endif // DEMO_H

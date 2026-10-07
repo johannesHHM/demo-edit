@@ -21,6 +21,7 @@
 #include "commands.h"
 #include "demo.h"
 #include "huffman.h"
+#include "merge.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,7 +57,7 @@ int mapname(char *mappath, char *out)
     return 1;
 }
 
-FILE *demofile = NULL, *outfile = NULL, *mapfile = NULL, *extmapfile = NULL;
+FILE *demofile = NULL, *outfile = NULL, *mapfile = NULL, *extmapfile = NULL, *mergefile = NULL;
 demo DEMO;
 
 void exitperror(char *str)
@@ -102,6 +103,34 @@ void setmap(arg *argument)
         exit(EXIT_FAILURE);
     }
     fclose(mapfile);
+}
+
+void runmerge(arg *mergearg)
+{
+    demo other;
+    int ret;
+
+    mergefile = fopen(mergearg->opts[0], "r");
+    if (!mergefile)
+    {
+        fprintf(stderr, "Error: failed to open merge demofile '%s', ", mergearg->opts[0]);
+        exitperror("reason");
+    }
+    if (readdemo(mergefile, &other) < 0)
+    {
+        fprintf(stderr, "Error: failed to parse merge demo '%s'\n", mergearg->opts[0]);
+        exit(EXIT_FAILURE);
+    }
+    fclose(mergefile);
+
+    ret = mergedemo(&DEMO, &other);
+    if (ret < 0)
+    {
+        fprintf(stderr, "Error: failed to merge demo '%s'\n", mergearg->opts[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    freedemo(&other);
 }
 
 void runrename(arg *renamearg)
@@ -187,6 +216,7 @@ int main(int argc, char *argv[])
     addopt("-r", "--rename", 2, "<id/name> <name>", "Renames player with id/name to name", runrename);
     addopt("-s", "--skin", 2, "<id/name> <skin>", "Set skin of player with id/name to skin", runsetskin);
     addopt("-m", "--map", 1, "<map>", "Changes the map of demo to map", setmap);
+    addopt("-M", "--merge", 1, "<demo>", "Merges the game data of demo into input demo", runmerge);
     addopt("-e", "--extract-map", 1, "<file>", "Saves the map of demo to file", NULL);
     addopt("-o", "--output", 1, "<file>", "Saves the output demo to file", NULL);
     addopt("-i", "--info", 0, NULL, "Prints info of demo", NULL);
@@ -215,6 +245,17 @@ int main(int argc, char *argv[])
 
     demoarg->runarg(demoarg);
 
+    int i = 0;
+    arg *opt;
+    while (1)
+    {
+        opt = getopt("-M", i);
+        if (opt == NULL)
+            break;
+        opt->runarg(opt);
+        i++;
+    }
+
     arg *outarg = getopt("-o", 0);
     arg *maparg = getopt("-m", 0);
     arg *exmarg = getopt("-e", 0);
@@ -236,8 +277,6 @@ int main(int argc, char *argv[])
     if (chtarg)
         printchat(&DEMO);
 
-    int i = 0;
-    arg *opt;
     while (1)
     {
         opt = getopt("-s", i);
