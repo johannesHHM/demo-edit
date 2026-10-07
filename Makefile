@@ -42,8 +42,8 @@ OBJ = \
 	obj/huffman.o \
 	obj/main.o \
 	obj/pack.o \
-	src/snap.o \
-	src/merge.o
+	obj/snap.o \
+	obj/merge.o
 
 all: $(OBJDIR) $(TARGET)
 
