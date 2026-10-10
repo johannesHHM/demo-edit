@@ -1,57 +1,67 @@
-# dedit
-
 ![Screenshot](https://jhhm.no/img/dedit-banner.jpg)
 
-## about
+# dedit
 
-Change names, skins, maps and more of a teeworlds demo file. 
+Dedit is a [Teeworlds](https://teeworlds.com/) / [DDNet](https://ddnet.org/)
+demo inspector and editor, written in portable C99 with zero external
+dependencies beyond the standard C library. The code repository is hosted
+[here](https://git.jhhm.no/) and on
+[GitHub](https://github.com/johannesHHM/demo-edit).
 
-Dedit is tested with demo versions 5 and 6 (ddnet), but theoreticly 
-supports version 3 and 4 aswell. Dedit currently only supports the
-teeworlds 0.6 network protocol.
+## features
+
+- rename tees
+- change the skin of tees
+- change the map of the demo
+- merge data from multiple demos
+- extract the map from the demo
+- print chat log (same as [demo_extract_chat](https://ddnet.org/codebrowser/DDNet/tools/demo_extract_chat.cpp.html))
+- print information about each demo chunk
+
+## status & future work
+
+Dedit is currently only tested and confirmed working for demo versions 5 and 6
+(DDNet), and the Teeworlds 0.6 network protocol. I might tinker with supporting
+older demo versions, but the use case for this would be slim to none. Support
+for the 0.7 network protocol is planned, but I don't know when I will get
+around to implementing it.
 
 ## compile
 
+Requires a C99 compiler and a POSIX compatible `make`.
+
 ```sh
-git clone https://github.com/johannesHHM/demo-edit
-cd demo-edit
 make
-```
-
-## run
-
-```sh
-./dedit --help
 ```
 
 ## examples
 
-Under are a couple of examples that should run without issue after compiling.
+Below are a couple of examples that should run without issue after compiling.
 
-Prints info of 'clip.demo'. Info consists of demo header and chunk counts.
+Prints info of `clip.demo`. Info consists of demo header and chunk counts.
 ```sh
 ./dedit testdata/clip.demo --info
 ```
 
-Rename player with clientid 3 to 'holymadtee', change map to 'ice.map'
-and save the output to 'out.demo'.
+Rename player with clientid 3 to *holymadtee*, change map to `ice.map`
+and save the output to `out.demo`.
 ```sh
 ./dedit testdata/clip.demo --rename 3 holymadtee --map testdata/ice.map --output out.demo
 ```
 
-Set the skin of player with name 'New Hero' to 'bomb', rename 'New Hero'
-to 'Bob-omb', change map to 'jungle.map' and save the output to 'out.demo'.
+Set the skin of player with name *New Hero* to *bomb*, rename *New Hero*
+to *Bob-omb*, change map to `jungle.map` and save the output to `out.demo`.
 ```sh
-./dedit testdata/clip.demo -s "New Hero" bomb -r "New Hero" Bob-omb -m testdata/jungle.map -o out.demo
+./dedit testdata/clip.demo --skin "New Hero" bomb --rename "New Hero" Bob-omb --map testdata/jungle.map -o out.demo
 ```
 
-Merge demos 'catchup_NewHero.demo', 'catchup_hex.demo and 'catchup_faceless.demo'
-and save the output to 'out.demo'.
+Merge demos `catchup_hero.demo`, `catchup_hex.demo` and `catchup_faceless.demo`
+and save the output to `out.demo`.
 ```sh
-./dedit testdata/catchup_NewHero.demo -M catchup_hex.demo -M testdata/catchup_faceless.demo -o out.demo
+./dedit testdata/catchup_hero.demo -M testdata/catchup_hex.demo -M testdata/catchup_faceless.demo -o out.demo
 ```
 
-Tip: 'out.demo' can be quickly viewed by running
+Tip: `out.demo` can be quickly viewed by running
 ```sh
 DDNet out.demo
 ```
@@ -80,12 +90,12 @@ Options:
 ## credits
 
 Some functions/implementations are heavily inspired by other sources.
-They are commented in the code with links to their referances.
-Under are some credits:
+They are commented in the code with links to their references.
+Below are some credits:
 
 - [libtw2](https://github.com/heinrich5991/libtw2): variable length int implementation, demo/snapshot documentation
-- [teeworlds](https://github.com/teeworlds/teeworlds): huffman implementation
-- [ddnet](https://github.com/ddnet/ddnet): some demo writing specifics
+- [Teeworlds](https://github.com/teeworlds/teeworlds): huffman implementation
+- [DDNet](https://github.com/ddnet/ddnet): some demo writing specifics
 
 ## license
 
