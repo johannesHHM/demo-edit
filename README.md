@@ -5,7 +5,7 @@
 Dedit is a [Teeworlds](https://teeworlds.com/) / [DDNet](https://ddnet.org/)
 demo inspector and editor, written in portable C99 with zero external
 dependencies beyond the standard C library. The code repository is hosted
-[here](https://git.jhhm.no/) and on
+[here](https://jhhm.no/repos/dedit) and on
 [GitHub](https://github.com/johannesHHM/demo-edit).
 
 ## features
